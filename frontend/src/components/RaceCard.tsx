@@ -1,48 +1,106 @@
-import { Activity, Clock, Cloud, Radio } from "lucide-react";
+import { Activity, Clock, MapPin, Radio } from "lucide-react";
+import { useRaceWeekend } from "../hooks/useRaceWeekend";
+import type { RaceSession, RaceWeekendStatus } from "../types/f1";
 
-const RACE = {
-  round: 1,
-  totalRounds: 24,
-  name: "Australian Grand Prix",
-  circuit: "Albert Park Grand Prix Circuit",
-  raceDate: new Date("2026-03-08T04:00:00+00:00"),
-  sessions: [
-    { type: "FP1", day: "Friday", time: "01:30 UTC" },
-    { type: "FP2", day: "Friday", time: "05:00 UTC" },
-    { type: "FP3", day: "Saturday", time: "01:30 UTC" },
-    { type: "QUALIFYING", day: "Saturday", time: "05:00 UTC" },
-    { type: "RACE", day: "Sunday", time: "04:00 UTC" },
-  ],
-  circuitLength: "5.303 km",
-  raceDistance: "307.574 km",
-  laps: 58,
-  lapRecord: "1:24.125",
-  lapRecordHolder: "M. Schumacher",
-  lapRecordYear: 2004,
-  turns: 14,
+function formatTime(iso: string): string {
+  return (
+    new Date(iso).toLocaleTimeString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "UTC",
+    }) + " UTC"
+  );
+}
+
+function formatDateRange(start: string, end: string): string {
+  const s = new Date(start);
+  const e = new Date(end);
+  const month = s.toLocaleDateString("en-GB", { month: "short" }).toUpperCase();
+  return `${s.getUTCDate()}-${e.getUTCDate()} ${month}`;
+}
+
+function getSessionLabel(session: RaceSession | null): string {
+  if (!session) return "-";
+  return session.name.toUpperCase();
+}
+
+function getSessionSubtext(session: RaceSession | null): string {
+  if (!session) return "";
+  return formatTime(session.dateStart);
+}
+
+const STATUS_LABEL: Record<RaceWeekendStatus, string> = {
+  session_live: "LIVE NOW",
+  between_sessions: "BETWEEN SESSIONS",
+  upcoming: "NEXT RACE WEEKEND",
+  weekend_over: "WEEKEND OVER",
+  season_over: "SEASON OVER",
 };
 
-const AlbertParkOutline = () => (
-  <svg
-    id="svg4136"
-    xmlns="http://www.w3.org/2000/svg"
-    height="203.95"
-    viewBox="0 0 399.50629 203.94954"
-    width="399.5"
-    version="1.1"
-  >
-    <path
-      id="path4146"
-      stroke-linejoin="round"
-      d="m14.303 54.81c-7.2586 16.136-7.0661 15.467-9.8782 34.322-2.5969 17.412-3.5275 15.26 14.18 32.841 8.8917 8.8279 14.803 15.25 14.648 15.914-0.14226 0.61248-2.8958 5.0125-6.1203 9.7766-9.859 14.567-9.4038 15.862 7.3215 20.846 25.015 7.4546 48.885 10.688 76.968 10.428 27.962-0.25946 34.415 2.1095 38.342 14.071 2.8101 8.5584-2.1545 8.1078 86.272 7.8144 63.777-0.2116 81.519-0.64863 83.567-2.0602 5.3008-3.6542 6.8644-8.4601 6.2506-19.219-0.78234-13.714-1.9355-13.524 28.794-4.762 10.39 2.9626 13.986 3.521 16.711 2.5957 6.4807-2.2009 21.472-29.916 25.06-46.326 0.97132-4.4429-4.053-8.2548-28.194-21.392-38.955-21.199-38.148-21.026-79.689-17.087-15.766 1.495-19.491 3.0793-28.331 12.05-11.014 11.176-45.853 15.005-66.093 7.2634-27.63-10.58-57.44-48.047-51.74-65.044 2.81-8.374-13.11-23.074-42.03-38.817-15.58-8.4808-32.6-6.3434-48.635 6.107-8.331 6.468-11.137 7.526-23.662 8.926-5.4498 0.42935-11.039 25.692-13.742 31.752z"
-      stroke="#fff"
-      stroke-width="6"
-      fill="none"
-    />
-  </svg>
+// Skeleton
+const Skeleton = ({ className }: { className?: string }) => (
+  <div className={`animate-pulse bg-[#1A1D24] rounded-sm ${className ?? ""}`} />
+);
+
+const DataPoint = ({
+  icon,
+  label,
+  value,
+  sub,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string | null;
+  sub: string | null;
+}) => (
+  <div className="flex flex-col">
+    <div className="flex items-center gap-2 text-[#555] mb-1">
+      {icon}
+      <span className="text-[10px] font-bold tracking-wider">{label}</span>
+    </div>
+    {value === null ? (
+      <>
+        <Skeleton className="h-4 w-16 mb-1" />
+        <Skeleton className="h-3 w-10" />
+      </>
+    ) : (
+      <>
+        <span className="font-mono text-[#E0E0E0] text-sm">{value}</span>
+        <span className="font-mono text-[#00D2BE] text-[10px]">{sub}</span>
+      </>
+    )}
+  </div>
+);
+
+// Track Map placeholder
+const TrackPlaceholder = ({ name }: { name: string }) => (
+  <div className="relative w-full bg-[#050608] rounded border border-[#333]/50 overflow-hidden aspect-video">
+    <div className="absolute inset-0 flex items-center justify-center p-4">
+      <MapPin size={20} className="text-[#333]" />
+      <span className="text-[#333] font-mono text-xs tracking-widest uppercase">
+        {name}
+      </span>
+    </div>
+
+    <div className="absolute top-1 left-1 w-3 h-3 border-l border-t border-[#00D2BE]/30" />
+    <div className="absolute top-1 right-1 w-3 h-3 border-r border-t border-[#00D2BE]/30" />
+    <div className="absolute bottom-1 left-1 w-3 h-3 border-l border-b border-[#00D2BE]/30" />
+    <div className="absolute bottom-1 right-1 w-3 h-3 border-r border-b border-[#00D2BE]/30" />
+  </div>
 );
 
 export default function RaceCard() {
+  const { data, loading, error } = useRaceWeekend();
+
+  const { meeting, nextSession, activeSession, lastSession, status } =
+    data ?? {};
+  const currentSession =
+    activeSession ??
+    nextSession ??
+    (status === "weekend_over" || status === "season_over"
+      ? lastSession
+      : null);
+
   return (
     <div className="relative w-full bg-[#0A0C10] border border-[#00D2BE]/20 rounded-sm overflow-hidden">
       {/* Corner Markers */}
@@ -56,76 +114,77 @@ export default function RaceCard() {
         <div className="flex items-center gap-2">
           <Activity size={14} className="text-[#00D2BE]" />
           <span className="text-[#00D2BE] font-mono text-xs font-bold tracking-widest">
-            NEXT RACE
+            {STATUS_LABEL[status ?? "upcoming"]}
           </span>
         </div>
+        {error && (
+          <span className="text-red-400 font-mono text-[10px] tracking-wider">
+            FEED ERROR
+          </span>
+        )}
       </div>
 
       {/* Body */}
       <div className="p-6">
         <div className="flex flex-col gap-1 mb-6">
-          <h3 className="text-2xl font-bold text-white tracking-wide uppercase">
-            {RACE.name}
-          </h3>
-          <span className="text-[#9CA3AF] text-sm font-light">
-            {RACE.circuit}
-          </span>
+          {loading ? (
+            <>
+              <Skeleton className="h-7 w-3/4" />
+              <Skeleton className="h-4 w-1/2 mt-1" />
+            </>
+          ) : (
+            <>
+              <h3 className="text-2xl font-bold text-white tracking-wide uppercase">
+                {meeting?.name ?? "-"}
+              </h3>
+              <span className="text-[#9CA3AF] text-sm font-light">
+                {meeting?.location ?? "-"}, {meeting?.country ?? "-"}
+              </span>
+            </>
+          )}
         </div>
 
         {/* Data Grid */}
         <div className="grid grid-cols-2 gap-y-4 gap-x-8 mb-8 border-t border-b border-[#333] py-4">
           <DataPoint
             icon={<Clock size={14} />}
-            label="ROUND"
-            value="RD. 01"
-            sub="2026 Season"
-          />
-          <DataPoint
-            icon={<Clock size={14} />}
             label="DATE"
-            value="MAR 08"
-            sub="1:30 UTC"
+            value={
+              loading
+                ? null
+                : meeting
+                  ? formatDateRange(meeting.dateStart, meeting.dateEnd)
+                  : "-"
+            }
+            sub={
+              loading
+                ? null
+                : meeting
+                  ? `${new Date(meeting.dateStart).getUTCFullYear()}`
+                  : "-"
+            }
           />
           <DataPoint
             icon={<Radio size={14} />}
             label="SESSION"
-            value="QUALIFYING"
-            sub="Next: 12:00 UTC"
+            value={loading ? null : getSessionLabel(currentSession ?? null)}
+            sub={loading ? null : getSessionSubtext(currentSession ?? null)}
           />
           <DataPoint
-            icon={<Cloud size={14} />}
-            label="WEATHER"
-            value="21°C CLOUDY"
-            sub="30% Rain"
+            icon={<MapPin size={14} />}
+            label="Circuit"
+            value={
+              loading ? null : (meeting?.circuit ?? meeting?.location ?? "-")
+            }
+            sub={loading ? null : (meeting?.country ?? "-")}
           />
         </div>
 
-        {/* Track Map Visualisation */}
-        <div className="relative w-full h-48 flex items-center justify-center opacity-80 hover:opacity-100 transition-opacity duration-500">
-          <AlbertParkOutline />
-        </div>
+        {/* Track Map */}
+        <TrackPlaceholder
+          name={meeting?.circuit ?? meeting?.name ?? "Circuit"}
+        />
       </div>
     </div>
   );
 }
-
-const DataPoint = ({
-  icon,
-  label,
-  value,
-  sub,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  sub: string;
-}) => (
-  <div className="flex flex-col">
-    <div className="flex items-center gap-2 text-[#555] mb-1">
-      {icon}
-      <span className="text-[10px] font-bold tracking-wider">{label}</span>
-    </div>
-    <span className="font-mono text-[#E0E0E0] text-sm">{value}</span>
-    <span className="font-mono text-[#00D2BE] text-[10px]">{sub}</span>
-  </div>
-);
