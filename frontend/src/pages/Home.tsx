@@ -1,12 +1,48 @@
 import { Terminal } from "lucide-react";
 import RaceCard from "../components/RaceCard";
+import { useEffect, useState } from "react";
+import { useRaceWeekend } from "../hooks/useRaceWeekend";
+
+function useCountdown(targetIso: string | null) {
+  const [display, setDisplay] = useState("--D --H --M --S");
+
+  useEffect(() => {
+    if (!targetIso) return;
+
+    const update = () => {
+      const diff = new Date(targetIso).getTime() - Date.now();
+      if (diff <= 0) {
+        setDisplay("0D 0H 0M 0S");
+        return;
+      }
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((diff / (1000 * 60)) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+      setDisplay(`${d}D ${h}H ${m}M ${s}S`);
+    };
+
+    update();
+    const id = setInterval(update, 1000);
+    return () => clearInterval(id);
+  }, [targetIso]);
+
+  return display;
+}
 
 export default function Home() {
+  const { data } = useRaceWeekend();
+
+  const countdownTarget =
+    data?.nextSession?.dateStart ?? data?.activeSession?.dateStart ?? null;
+
+  const countdown = useCountdown(countdownTarget);
+
   return (
     <div className="min-h-screen bg-[#050608] text-[#E0E0E0] flex flex-col overflow-hidden relative">
       {/* ------ Header ------- */}
       <header className="w-full mx-auto px-6 py-6 flex items-center justify-between relative border-b border-[#00D2BE]/10">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1">
           {/* Speed lines icon */}
           <div className="flex flex-col items-end gap-0.75">
             <div className="h-0.75 w-6 bg-[#00D2BE]" />
@@ -43,7 +79,7 @@ export default function Home() {
                   Race In:
                 </span>
                 <span className="text-[#00D2BE] font-bold w-35 tabular-nums">
-                  0D 0H 0M 0S
+                  {countdown}
                 </span>
               </div>
             </div>
