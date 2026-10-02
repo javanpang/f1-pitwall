@@ -6,6 +6,8 @@ import dotenv from "dotenv";
 import { errorHandler } from "./middleware/errorHandler.js";
 import { asyncHandler } from "./middleware/asyncHandler.js";
 
+import raceRoutes from "./routes/raceRoutes.js";
+
 dotenv.config();
 
 const app = express();
@@ -20,6 +22,10 @@ app.use(
   }),
 );
 
+// Routes
+app.use("/api/race", raceRoutes);
+
+// Health check
 app.get(
   "/health",
   asyncHandler(async (req, res) => {
