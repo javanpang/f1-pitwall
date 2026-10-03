@@ -1,6 +1,12 @@
 import axios from "axios";
+import { memoizeAsync } from "../utils/memoizeAsync.js";
 
 const BASE_URL = "https://api.openf1.org/v1";
+
+const TTL = {
+  MEETINGS: 6 * 60 * 60 * 1000,
+  SESSIONS: 5 * 60 * 1000,
+};
 
 const openf1 = axios.create({
   baseURL: BASE_URL,
@@ -13,7 +19,7 @@ const openf1 = axios.create({
 
 // ==== Session Endpoints ====
 
-export async function getSessions({ year, meeting_key } = {}) {
+async function fetchSessions({ year, meeting_key } = {}) {
   const params = {};
   if (year) params.year = year;
   if (meeting_key) params.meeting_key = meeting_key;
@@ -31,7 +37,7 @@ export async function getLatestSession() {
 
 // ==== Meeting Endpoints ====
 
-export async function getMeetings({ year } = {}) {
+async function fetchMeetings({ year } = {}) {
   const params = {};
   if (year) params.year = year;
 
@@ -54,3 +60,6 @@ export async function getDrivers(sessionKey) {
   });
   return data;
 }
+
+export const getSessions = memoizeAsync(fetchSessions, { ttlMs: TTL.SESSIONS });
+export const getMeetings = memoizeAsync(fetchMeetings, { ttlMs: TTL.MEETINGS });
