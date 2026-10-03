@@ -1,4 +1,4 @@
-import { getMeetings, getSessions } from "../services/openf1Service.js";
+import { getMeetings, getSessions } from "./openf1Service.js";
 
 function shapeSession(s) {
   if (!s) return null;
@@ -26,39 +26,46 @@ function shapeMeeting(m) {
   };
 }
 
+// === Date helpers ===
+function toDate(value) {
+  return value ? new Date(value) : null;
+}
+
+function byStart(a, b) {
+  return toDate(a.date_start) - toDate(b.date_start);
+}
+
+function isLive(item, now) {
+  const start = toDate(item.date_start);
+  const end = toDate(item.date_end);
+  return start !== null && end !== null && now >= start && now <= end;
+}
+
+function hasEnded(item, now) {
+  const end = toDate(item.date_end);
+  return end !== null && end < now;
+}
+
 function resolveTargetMeeting(meetings, now) {
-  const sorted = [...meetings].sort(
-    (a, b) => new Date(a.date_start) - new Date(b.date_start),
-  );
+  const sorted = [...meetings].sort(byStart);
 
   for (const meeting of sorted) {
-    const start = new Date(meeting.date_start);
-    const end = new Date(meeting.date_end);
-
-    if (now >= start && now <= end) return { meeting, status: "live" };
-
-    if (start > now) return { meeting, status: "upcoming" };
+    if (isLive(meeting, now)) return { meeting, status: "live" };
+    if (toDate(meeting.date_start) > now)
+      return { meeting, status: "upcoming" };
   }
 
   return { meeting: sorted[sorted.length - 1], status: "season_over" };
 }
 
 function resolveActiveSessions(sessions, now) {
-  const sorted = [...sessions].sort(
-    (a, b) => new Date(a.date_start) - new Date(b.date_start),
-  );
+  const sorted = [...sessions].sort(byStart);
 
-  let activeSession = null;
-  let nextSession = null;
-  let lastSession = sorted[sorted.length - 1] ?? null;
+  const activeSession = sorted.find((s) => isLive(s, now)) ?? null;
+  const nextSession = sorted.find((s) => toDate(s.date_start) > now) ?? null;
 
-  for (const session of sorted) {
-    const start = new Date(session.date_start);
-    const end = new Date(session.date_end);
-
-    if (now >= start && now <= end) activeSession = session;
-    else if (start > now && !nextSession) nextSession = session;
-  }
+  const lastSession =
+    [...sorted].reverse().find((s) => hasEnded(s, now)) ?? null;
 
   const status = activeSession
     ? "session_live"
@@ -69,11 +76,14 @@ function resolveActiveSessions(sessions, now) {
   return { activeSession, nextSession, lastSession, status };
 }
 
-export async function getRaceWeekend() {
-  const now = new Date();
-  const year = now.getFullYear();
+export async function getRaceWeekend(now = new Date()) {
+  const year = now.getUTCFullYear();
 
-  const meetings = await getMeetings({ year });
+  let meetings = await getMeetings({ year });
+
+  if (!meetings.length) {
+    meetings = await getMeetings({ year: year - 1 });
+  }
   if (!meetings.length) return null;
 
   const { meeting, status: meetingStatus } = resolveTargetMeeting(
