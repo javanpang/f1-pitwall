@@ -1,5 +1,6 @@
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
 import { memoizeAsync } from "../utils/memoizeAsync.js";
+import { toUpstreamError } from "./upstreamError.js";
 
 const BASE_URL = "https://api.openf1.org/v1";
 
@@ -17,15 +18,35 @@ const openf1 = axios.create({
   },
 });
 
+// Handle OpenF1 API errors consistently
+openf1.interceptors.response.use(
+  (response) => response,
+  (error) => Promise.reject(toUpstreamError(error)),
+);
+
 // ==== Session Endpoints ====
+async function getList(path, params) {
+  try {
+    const { data } = await openf1.get(path, { params });
+    return data;
+  } catch (error) {
+    const original = error.cause ?? error;
+    if (
+      isAxiosError(original) &&
+      original.response?.status === 404 &&
+      original.response.data?.detail === "No results found."
+    )
+      return [];
+    throw error;
+  }
+}
 
 async function fetchSessions({ year, meeting_key } = {}) {
   const params = {};
   if (year) params.year = year;
   if (meeting_key) params.meeting_key = meeting_key;
 
-  const { data } = await openf1.get("/sessions", { params });
-  return data;
+  return getList("/sessions", params);
 }
 
 export async function getLatestSession() {
@@ -41,8 +62,7 @@ async function fetchMeetings({ year } = {}) {
   const params = {};
   if (year) params.year = year;
 
-  const { data } = await openf1.get("/meetings", { params });
-  return data;
+  return getList("/meetings", params);
 }
 
 export async function getLatestMeeting() {

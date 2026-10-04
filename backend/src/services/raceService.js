@@ -1,4 +1,4 @@
-import { getMeetings, getSessions } from "./openf1Service.js";
+import { getMeetings, getSessions } from "../clients/openf1Client.js";
 
 function shapeSession(s) {
   if (!s) return null;
