@@ -1,11 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-vi.mock("./openf1Service.js", () => ({
+vi.mock("../clients/openf1Client.js", () => ({
   getMeetings: vi.fn(),
   getSessions: vi.fn(),
 }));
 
-import { getMeetings, getSessions } from "./openf1Service.js";
+import { getMeetings, getSessions } from "../clients/openf1Client.js";
 import {
   getRaceWeekend,
   resolveActiveSessions,

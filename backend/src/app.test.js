@@ -1,5 +1,6 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
+import { HttpError } from "./errors/httpError.js";
 
 vi.mock("./services/raceService.js", () => ({
   getRaceWeekend: vi.fn(),
@@ -65,5 +66,44 @@ describe("app wiring", () => {
       "https://pitwall.example.com",
     );
     expect(other.headers["access-control-allow-origin"]).not.toBe("*");
+  });
+});
+
+describe("error handling", () => {
+  beforeEach(() => vi.spyOn(console, "error").mockImplementation(() => {}));
+
+  it("returns the status, message and headers of an HttpError", async () => {
+    getRaceWeekend.mockRejectedValue(
+      new HttpError(503, "Rate limited", { headers: { "Retry-After": "30" } }),
+    );
+
+    const res = await request(app).get("/api/race/weekend");
+
+    expect(res.status).toBe(503);
+    expect(res.body).toEqual({ error: "Rate limited" });
+    expect(res.headers["retry-after"]).toBe("30");
+  });
+
+  it("hides the message of unexpected errors", async () => {
+    getRaceWeekend.mockRejectedValue(
+      new Error("secret: db password is hunter2"),
+    );
+
+    const res = await request(app).get("/api/race/weekend");
+
+    expect(res.status).toBe(500);
+    expect(res.body).toEqual({ error: "Internal Server Error" });
+  });
+
+  it("does not forward a raw upstream status (regression: 429 leak)", async () => {
+    const leaky = Object.assign(
+      new Error("Request failed with status code 429"),
+      { status: 429 },
+    );
+    getRaceWeekend.mockRejectedValue(leaky);
+
+    const res = await request(app).get("/api/race/weekend");
+
+    expect(res.status).toBe(500);
   });
 });
