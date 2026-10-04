@@ -46,7 +46,7 @@ function hasEnded(item, now) {
   return end !== null && end < now;
 }
 
-function resolveTargetMeeting(meetings, now) {
+export function resolveTargetMeeting(meetings, now) {
   const sorted = [...meetings].sort(byStart);
 
   for (const meeting of sorted) {
@@ -58,7 +58,7 @@ function resolveTargetMeeting(meetings, now) {
   return { meeting: sorted[sorted.length - 1], status: "season_over" };
 }
 
-function resolveActiveSessions(sessions, now) {
+export function resolveActiveSessions(sessions, now) {
   const sorted = [...sessions].sort(byStart);
 
   const activeSession = sorted.find((s) => isLive(s, now)) ?? null;
