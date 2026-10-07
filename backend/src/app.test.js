@@ -6,8 +6,13 @@ vi.mock("./services/raceService.js", () => ({
   getRaceWeekend: vi.fn(),
 }));
 
+vi.mock("./services/seasonService.js", () => ({
+  getSeason: vi.fn(),
+}));
+
 import { getRaceWeekend } from "./services/raceService.js";
 import { createApp } from "./app.js";
+import { getSeason } from "./services/seasonService.js";
 
 const app = createApp({ frontendUrl: "https://pitwall.example.com" });
 
@@ -106,4 +111,27 @@ describe("error handling", () => {
 
     expect(res.status).toBe(500);
   });
+});
+
+describe("GET /api/season/:year", () => {
+  it("returns the season from the service, passing the year as a number", async () => {
+    getSeason.mockResolvedValue([]);
+
+    const res = await request(app).get("/api/seasons/2025");
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([]);
+    expect(getSeason).toHaveBeenCalledWith(2025);
+  });
+
+  it.each(["abc", "2022", "1999", "20260", "0x7EA"])(
+    "rejects invalid year %s with a 400 and never calls the service",
+    async (year) => {
+      const res = await request(app).get(`/api/seasons/${year}`);
+
+      expect(res.status).toBe(400);
+      expect(res.body.error).toMatch(/year must be between/i);
+      expect(getSeason).not.toHaveBeenCalled();
+    },
+  );
 });
