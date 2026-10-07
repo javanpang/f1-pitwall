@@ -1,5 +1,5 @@
-import { apiClient } from "./client";
-import type { RaceWeekendData } from "../types/f1";
+import { apiClient } from "../../../shared/api/client.ts";
+import type { RaceWeekendData } from "../../../shared/types/f1.ts";
 
 export const race = {
   /**

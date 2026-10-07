@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import Season from "../components/Season";
-import Logo from "../components/Logo";
+import Season from "./components/Season";
+import Logo from "../../shared/components/Logo";
 
 export default function Seasons() {
   return (

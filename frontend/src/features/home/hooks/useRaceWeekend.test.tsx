@@ -2,9 +2,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { useRaceWeekend } from "./useRaceWeekend";
-import { race } from "../api/race";
-import type { RaceWeekendData } from "../types/f1";
+import { useRaceWeekend } from "./useRaceWeekend.ts";
+import { race } from "../api/race.ts";
+import type { RaceWeekendData } from "../../../shared/types/f1.ts";
 
 vi.mock("../api/race", () => ({
   race: { getRaceWeekend: vi.fn() },

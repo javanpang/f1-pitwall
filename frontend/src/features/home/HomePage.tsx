@@ -1,8 +1,8 @@
 import { Terminal } from "lucide-react";
 import { Link } from "react-router-dom";
-import RaceCard from "../components/RaceCard";
+import RaceCard from "./components/RaceCard.tsx";
 import { useEffect, useState } from "react";
-import { useRaceWeekend } from "../hooks/useRaceWeekend";
+import { useRaceWeekend } from "./hooks/useRaceWeekend";
 
 function useCountdown(targetIso: string | null) {
   const [display, setDisplay] = useState("--D --H --M --S");

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { season } from "../api/season";
-import type { MeetingWithSessions } from "../types/f1";
+import type { MeetingWithSessions } from "../../../shared/types/f1";
 
 const EMPTY: MeetingWithSessions[] = [];
 

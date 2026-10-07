@@ -1,6 +1,9 @@
 import { Activity, Clock, MapPin, Radio } from "lucide-react";
-import { useRaceWeekend } from "../hooks/useRaceWeekend";
-import type { RaceSession, RaceWeekendStatus } from "../types/f1";
+import { useRaceWeekend } from "../hooks/useRaceWeekend.ts";
+import type {
+  RaceSession,
+  RaceWeekendStatus,
+} from "../../../shared/types/f1.ts";
 
 function formatTime(iso: string): string {
   return (

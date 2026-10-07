@@ -3,7 +3,7 @@ import type {
   RaceSession,
   SessionStatus,
   SessionTypeFilter,
-} from "../types/f1.ts";
+} from "../../../shared/types/f1.ts";
 
 export const FIRST_SEASON = 2023;
 export const CURRENT_YEAR = new Date().getUTCFullYear();

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { RaceSession, SessionStatus } from "../types/f1";
+import type { RaceSession, SessionStatus } from "../../../shared/types/f1.ts";
 import {
   formatDateRange,
   formatWhen,
@@ -7,7 +7,7 @@ import {
   type FeaturedRound,
   type Round,
   type SessionColumn,
-} from "../utils/season";
+} from "../utils/season.ts";
 
 interface SessionCellProps {
   session: RaceSession | undefined;
