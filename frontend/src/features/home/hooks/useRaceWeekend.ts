@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
-import type { RaceWeekendData } from "../types/f1";
-import { race } from "../api/race";
+import type { RaceWeekendData } from "../../../shared/types/f1.ts";
+import { race } from "../api/race.ts";
 
 interface UseRaceWeekendResult {
   data: RaceWeekendData | null;

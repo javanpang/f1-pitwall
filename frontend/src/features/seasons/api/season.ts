@@ -1,5 +1,5 @@
-import type { MeetingWithSessions } from "../types/f1";
-import { apiClient } from "./client";
+import type { MeetingWithSessions } from "../../../shared/types/f1.ts";
+import { apiClient } from "../../../shared/api/client.ts";
 
 export const season = {
   getSeason: async (year: number): Promise<MeetingWithSessions[]> => {
