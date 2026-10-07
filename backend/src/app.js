@@ -3,6 +3,7 @@ import cors from "cors";
 
 import { errorHandler } from "./middleware/errorHandler.js";
 import raceRoutes from "./routes/raceRoutes.js";
+import seasonRoutes from "./routes/seasonRoutes.js";
 
 export function createApp({ frontendUrl = "http://localhost:5173" } = {}) {
   const app = express();
@@ -10,6 +11,7 @@ export function createApp({ frontendUrl = "http://localhost:5173" } = {}) {
   app.use(cors({ origin: frontendUrl, credentials: true }));
 
   app.use("/api/race", raceRoutes);
+  app.use("/api/seasons", seasonRoutes);
 
   app.get("/health", (req, res) => {
     res.json({

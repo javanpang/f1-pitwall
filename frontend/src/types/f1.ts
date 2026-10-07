@@ -40,3 +40,12 @@ export interface RaceWeekendData {
   nextSession: RaceSession | null;
   lastSession: RaceSession | null;
 }
+
+export interface MeetingWithSessions {
+  meeting: RaceMeeting;
+  sessions: RaceSession[];
+}
+
+export type SessionTypeFilter = "all" | "Practice" | "Qualifying" | "Race";
+
+export type SessionStatus = "finished" | "live" | "upcoming";
