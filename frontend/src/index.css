@@ -1,5 +1,24 @@
 @import "tailwindcss";
 
+@theme {
+  --color-carbon-100: #050608;
+  --color-carbon-200: #0A0C10;
+  --color-carbon-300: #1A1C20;
+  --color-accent: #00D2BE;
+  --color-accent-hover: #00EDD8;
+  --color-body: #E0E0E0;
+  --color-muted: #9CA3AF;
+  --color-faint: #555555;
+  --color-live: #f87171;
+}
+
+@utility bg-blueprint {
+  background-image:
+    linear-gradient(to right, rgb(0 210 190 / 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(0 210 190 / 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
 :root {
   --pw-bg-carbon-100: #050608;
   --pw-bg-carbon-200: #0A0C10;

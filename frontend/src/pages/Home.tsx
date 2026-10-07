@@ -1,4 +1,5 @@
 import { Terminal } from "lucide-react";
+import { Link } from "react-router-dom";
 import RaceCard from "../components/RaceCard";
 import { useEffect, useState } from "react";
 import { useRaceWeekend } from "../hooks/useRaceWeekend";
@@ -107,7 +108,10 @@ export default function Home() {
               </button>
 
               {/* Demo Replay Button */}
-              <button className="flex items-center justify-between px-8 py-3 text-[#9CA3AF] text-sm tracking-wider uppercase font-medium border border-[#1F2937] rounded-sm hover:border-[#00D2BE]/30 hover:bg-[#00D2BE]/5 transition-all duration-300 cursor-pointer">
+              <Link
+                to="/seasons"
+                className="flex items-center justify-between px-8 py-3 text-[#9CA3AF] text-sm tracking-wider uppercase font-medium border border-[#1F2937] rounded-sm hover:border-[#00D2BE]/30 hover:bg-[#00D2BE]/5 transition-all duration-300 cursor-pointer"
+              >
                 <span>View Replay</span>
                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                   <path
@@ -118,7 +122,7 @@ export default function Home() {
                     strokeLinejoin="round"
                   />
                 </svg>
-              </button>
+              </Link>
             </div>
           </div>
 
