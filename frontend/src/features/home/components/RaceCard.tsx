@@ -1,23 +1,8 @@
 import { Activity, Clock, MapPin, Radio } from "lucide-react";
 import { useCurrentWeekend } from "../hooks/useCurrentWeekend.ts";
 import type { Session, WeekendStatus } from "../../../shared/types/f1.ts";
-
-function formatTime(iso: string): string {
-  return (
-    new Date(iso).toLocaleTimeString("en-GB", {
-      hour: "2-digit",
-      minute: "2-digit",
-      timeZone: "UTC",
-    }) + " UTC"
-  );
-}
-
-function formatDateRange(start: string, end: string): string {
-  const s = new Date(start);
-  const e = new Date(end);
-  const month = s.toLocaleDateString("en-GB", { month: "short" }).toUpperCase();
-  return `${s.getUTCDate()}-${e.getUTCDate()} ${month}`;
-}
+import { formatDateRange } from "../../../shared/utils.ts";
+import { formatTime } from "../../../shared/utils.ts";
 
 function getSessionLabel(session: Session | null): string {
   if (!session) return "-";
@@ -153,7 +138,10 @@ export default function RaceCard() {
               loading
                 ? null
                 : meeting
-                  ? formatDateRange(meeting.dateStart, meeting.dateEnd)
+                  ? formatDateRange(
+                      meeting.dateStart,
+                      meeting.dateEnd,
+                    ).toUpperCase()
                   : "-"
             }
             sub={
