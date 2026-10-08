@@ -1,11 +1,11 @@
-export type RaceWeekendStatus =
+export type WeekendStatus =
   | "upcoming"
   | "session_live"
   | "between_sessions"
   | "weekend_over"
   | "season_over";
 
-export interface RaceSession {
+export interface Session {
   key: number;
   name: string;
   type:
@@ -20,7 +20,7 @@ export interface RaceSession {
   dateEnd: string | null;
 }
 
-export interface RaceMeeting {
+export interface Meeting {
   key: number;
   name: string;
   officialName: string | null;
@@ -32,18 +32,18 @@ export interface RaceMeeting {
   year: number;
 }
 
-export interface RaceWeekendData {
-  status: RaceWeekendStatus;
-  meeting: RaceMeeting;
-  sessions: RaceSession[];
-  activeSession: RaceSession | null;
-  nextSession: RaceSession | null;
-  lastSession: RaceSession | null;
+export interface WeekendData {
+  status: WeekendStatus;
+  meeting: Meeting;
+  sessions: Session[];
+  activeSession: Session | null;
+  nextSession: Session | null;
+  lastSession: Session | null;
 }
 
 export interface MeetingWithSessions {
-  meeting: RaceMeeting;
-  sessions: RaceSession[];
+  meeting: Meeting;
+  sessions: Session[];
 }
 
 export type SessionTypeFilter = "all" | "Practice" | "Qualifying" | "Race";

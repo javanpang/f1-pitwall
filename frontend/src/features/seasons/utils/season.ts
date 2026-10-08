@@ -1,6 +1,6 @@
 import type {
   MeetingWithSessions,
-  RaceSession,
+  Session,
   SessionStatus,
   SessionTypeFilter,
 } from "../../../shared/types/f1.ts";
@@ -78,10 +78,7 @@ export function getVisibleColumns(
 /**
  * Get the status of a session based on the current timestamp. (finished, live, upcoming)
  */
-export function getSessionStatus(
-  session: RaceSession,
-  now: number,
-): SessionStatus {
+export function getSessionStatus(session: Session, now: number): SessionStatus {
   const start = Date.parse(session.dateStart);
   if (now < start) return "upcoming";
   const end = session.dateEnd ? Date.parse(session.dateEnd) : null;

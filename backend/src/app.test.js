@@ -2,15 +2,15 @@ import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import { HttpError } from "./errors/httpError.js";
 
-vi.mock("./services/raceService.js", () => ({
-  getRaceWeekend: vi.fn(),
+vi.mock("./services/weekendService.js", () => ({
+  getCurrentWeekend: vi.fn(),
 }));
 
 vi.mock("./services/seasonService.js", () => ({
   getSeason: vi.fn(),
 }));
 
-import { getRaceWeekend } from "./services/raceService.js";
+import { getCurrentWeekend } from "./services/weekendService.js";
 import { createApp } from "./app.js";
 import { getSeason } from "./services/seasonService.js";
 
@@ -28,23 +28,23 @@ describe("GET /health", () => {
   });
 });
 
-describe("GET /api/race/weekend", () => {
+describe("GET /api/weekends/current", () => {
   it("returns the weekend data from the service", async () => {
-    getRaceWeekend.mockResolvedValue({ status: "upcoming" });
+    getCurrentWeekend.mockResolvedValue({ status: "upcoming" });
 
-    const res = await request(app).get("/api/race/weekend");
+    const res = await request(app).get("/api/weekends/current");
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ status: "upcoming" });
   });
 
   it("returns 404 when no meetings exist", async () => {
-    getRaceWeekend.mockResolvedValue(null);
+    getCurrentWeekend.mockResolvedValue(null);
 
-    const res = await request(app).get("/api/race/weekend");
+    const res = await request(app).get("/api/weekends/current");
 
     expect(res.status).toBe(404);
-    expect(res.body.error).toMatch(/no race weekend found/i);
+    expect(res.body.error).toMatch(/no weekend found/i);
   });
 });
 
@@ -78,11 +78,11 @@ describe("error handling", () => {
   beforeEach(() => vi.spyOn(console, "error").mockImplementation(() => {}));
 
   it("returns the status, message and headers of an HttpError", async () => {
-    getRaceWeekend.mockRejectedValue(
+    getCurrentWeekend.mockRejectedValue(
       new HttpError(503, "Rate limited", { headers: { "Retry-After": "30" } }),
     );
 
-    const res = await request(app).get("/api/race/weekend");
+    const res = await request(app).get("/api/weekends/current");
 
     expect(res.status).toBe(503);
     expect(res.body).toEqual({ error: "Rate limited" });
@@ -90,11 +90,11 @@ describe("error handling", () => {
   });
 
   it("hides the message of unexpected errors", async () => {
-    getRaceWeekend.mockRejectedValue(
+    getCurrentWeekend.mockRejectedValue(
       new Error("secret: db password is hunter2"),
     );
 
-    const res = await request(app).get("/api/race/weekend");
+    const res = await request(app).get("/api/weekends/current");
 
     expect(res.status).toBe(500);
     expect(res.body).toEqual({ error: "Internal Server Error" });
@@ -105,9 +105,9 @@ describe("error handling", () => {
       new Error("Request failed with status code 429"),
       { status: 429 },
     );
-    getRaceWeekend.mockRejectedValue(leaky);
+    getCurrentWeekend.mockRejectedValue(leaky);
 
-    const res = await request(app).get("/api/race/weekend");
+    const res = await request(app).get("/api/weekends/current");
 
     expect(res.status).toBe(500);
   });

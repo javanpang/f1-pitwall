@@ -51,7 +51,7 @@ export function resolveActiveSessions(sessions, now) {
   return { activeSession, nextSession, lastSession, status };
 }
 
-export async function getRaceWeekend(now = new Date()) {
+export async function getCurrentWeekend(now = new Date()) {
   const year = now.getUTCFullYear();
 
   let meetings = await getMeetings({ year });
