@@ -77,7 +77,7 @@ export default function Home() {
             <div className="flex items-center gap-3 font-mono text-sm">
               <div className="flex items-center gap-4 px-4 py-2 bg-[#00D2BE]/5 border border-[#00D2BE]/20 rounded-sm">
                 <span className="text-[#555] text-xs uppercase tracking-wider">
-                  Race In:
+                  Next Session:
                 </span>
                 <span className="text-[#00D2BE] font-bold w-35 tabular-nums">
                   {countdown}
