@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import SegmentedControl from "./SegmentedControl.tsx";
 import { useNow } from "../hooks/useNow.ts";
 import { useSeason } from "../hooks/useSeason.ts";
-import type { SessionTypeFilter } from "../../../shared/types/f1.ts";
+import type { SessionTypeFilter } from "../types.ts";
 import {
   CURRENT_YEAR,
   TYPE_OPTIONS,

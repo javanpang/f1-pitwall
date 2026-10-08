@@ -1,9 +1,11 @@
+import type { MeetingWithSessions, Session } from "../../../shared/types/f1.ts";
 import type {
-  MeetingWithSessions,
-  Session,
-  SessionStatus,
   SessionTypeFilter,
-} from "../../../shared/types/f1.ts";
+  SessionStatus,
+  SessionColumn,
+  Round,
+  FeaturedRound,
+} from "../types.ts";
 
 export const FIRST_SEASON = 2023;
 export const CURRENT_YEAR = new Date().getUTCFullYear();
@@ -20,12 +22,6 @@ export const TYPE_OPTIONS: { value: SessionTypeFilter; label: string }[] = [
   { value: "Race", label: "Race" },
 ];
 
-export interface SessionColumn {
-  name: string;
-  label: string;
-  type: Exclude<SessionTypeFilter, "all">;
-}
-
 export const SESSION_COLUMNS: readonly SessionColumn[] = [
   { name: "Practice 1", label: "FP1", type: "Practice" },
   { name: "Practice 2", label: "FP2", type: "Practice" },
@@ -35,10 +31,6 @@ export const SESSION_COLUMNS: readonly SessionColumn[] = [
   { name: "Sprint", label: "Sprint", type: "Race" },
   { name: "Race", label: "Race", type: "Race" },
 ];
-
-export interface Round extends MeetingWithSessions {
-  round: number;
-}
 
 /**
  * Adds a round number to each race weekend in the season, sorted in reverse chronological order.
@@ -83,11 +75,6 @@ export function getSessionStatus(session: Session, now: number): SessionStatus {
   if (now < start) return "upcoming";
   const end = session.dateEnd ? Date.parse(session.dateEnd) : null;
   return end !== null && now <= end ? "live" : "finished";
-}
-
-export interface FeaturedRound {
-  key: number;
-  kind: "live" | "next";
 }
 
 /**

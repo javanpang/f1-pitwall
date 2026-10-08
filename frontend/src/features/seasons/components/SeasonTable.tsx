@@ -1,13 +1,12 @@
 import { Link } from "react-router-dom";
-import type { Session, SessionStatus } from "../../../shared/types/f1.ts";
+import type { Session } from "../../../shared/types/f1.ts";
+import type { SessionStatus } from "../types.ts";
 import {
   formatDateRange,
   formatWhen,
   getSessionStatus,
-  type FeaturedRound,
-  type Round,
-  type SessionColumn,
 } from "../utils/season.ts";
+import type { FeaturedRound, Round, SessionColumn } from "../types.ts";
 
 interface SessionCellProps {
   session: Session | undefined;
