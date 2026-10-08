@@ -50,8 +50,8 @@ const DataPoint = ({
       </>
     ) : (
       <>
-        <span className="font-mono text-[#E0E0E0] text-sm">{value}</span>
-        <span className="font-mono text-[#00D2BE] text-[10px]">{sub}</span>
+        <span className="font-mono text-body text-sm">{value}</span>
+        <span className="font-mono text-body text-[10px]">{sub}</span>
       </>
     )}
   </div>
@@ -59,7 +59,7 @@ const DataPoint = ({
 
 // Track Map placeholder
 const TrackPlaceholder = ({ name }: { name: string }) => (
-  <div className="relative w-full bg-[#050608] rounded border border-[#333]/50 overflow-hidden aspect-video">
+  <div className="relative w-full bg-carbon-100 rounded border border-[#333]/50 overflow-hidden aspect-video">
     <div className="absolute inset-0 flex items-center justify-center p-4">
       <MapPin size={20} className="text-[#333]" />
       <span className="text-[#333] font-mono text-xs tracking-widest uppercase">
@@ -67,10 +67,10 @@ const TrackPlaceholder = ({ name }: { name: string }) => (
       </span>
     </div>
 
-    <div className="absolute top-1 left-1 w-3 h-3 border-l border-t border-[#00D2BE]/30" />
-    <div className="absolute top-1 right-1 w-3 h-3 border-r border-t border-[#00D2BE]/30" />
-    <div className="absolute bottom-1 left-1 w-3 h-3 border-l border-b border-[#00D2BE]/30" />
-    <div className="absolute bottom-1 right-1 w-3 h-3 border-r border-b border-[#00D2BE]/30" />
+    <div className="absolute top-1 left-1 w-3 h-3 border-l border-t border-accent/30" />
+    <div className="absolute top-1 right-1 w-3 h-3 border-r border-t border-accent/30" />
+    <div className="absolute bottom-1 left-1 w-3 h-3 border-l border-b border-accent/30" />
+    <div className="absolute bottom-1 right-1 w-3 h-3 border-r border-b border-accent/30" />
   </div>
 );
 
@@ -87,18 +87,18 @@ export default function RaceCard() {
       : null);
 
   return (
-    <div className="relative w-full bg-[#0A0C10] border border-[#00D2BE]/20 rounded-sm overflow-hidden">
+    <div className="relative w-full bg-carbon-200 border border-accent/20 rounded-sm overflow-hidden">
       {/* Corner Markers */}
-      <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-[#00D2BE]" />
-      <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-[#00D2BE]" />
-      <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-[#00D2BE]" />
-      <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-[#00D2BE]" />
+      <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-accent" />
+      <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-accent" />
+      <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-accent" />
+      <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-accent" />
 
       {/* Header */}
-      <div className="bg-[#00D2BE]/5 border-b border-[#00D2BE]/10 p-4 flex justify-between items-center">
+      <div className="bg-accent/5 border-b border-accent/10 p-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <Activity size={14} className="text-[#00D2BE]" />
-          <span className="text-[#00D2BE] font-mono text-xs font-bold tracking-widest">
+          <Activity size={14} className="text-accent" />
+          <span className="text-accent font-mono text-xs font-bold tracking-widest">
             {STATUS_LABEL[status ?? "upcoming"]}
           </span>
         </div>
@@ -122,7 +122,7 @@ export default function RaceCard() {
               <h3 className="text-2xl font-bold text-white tracking-wide uppercase">
                 {meeting?.name ?? "-"}
               </h3>
-              <span className="text-[#9CA3AF] text-sm font-light">
+              <span className="text-muted text-sm font-light">
                 {meeting?.location ?? "-"}, {meeting?.country ?? "-"}
               </span>
             </>
