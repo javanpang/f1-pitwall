@@ -1,9 +1,11 @@
+import type { MeetingWithSessions, Session } from "../../../shared/types/f1.ts";
 import type {
-  MeetingWithSessions,
-  Session,
-  SessionStatus,
   SessionTypeFilter,
-} from "../../../shared/types/f1.ts";
+  SessionStatus,
+  SessionColumn,
+  Round,
+  FeaturedRound,
+} from "../types.ts";
 
 export const FIRST_SEASON = 2023;
 export const CURRENT_YEAR = new Date().getUTCFullYear();
@@ -20,12 +22,6 @@ export const TYPE_OPTIONS: { value: SessionTypeFilter; label: string }[] = [
   { value: "Race", label: "Race" },
 ];
 
-export interface SessionColumn {
-  name: string;
-  label: string;
-  type: Exclude<SessionTypeFilter, "all">;
-}
-
 export const SESSION_COLUMNS: readonly SessionColumn[] = [
   { name: "Practice 1", label: "FP1", type: "Practice" },
   { name: "Practice 2", label: "FP2", type: "Practice" },
@@ -35,10 +31,6 @@ export const SESSION_COLUMNS: readonly SessionColumn[] = [
   { name: "Sprint", label: "Sprint", type: "Race" },
   { name: "Race", label: "Race", type: "Race" },
 ];
-
-export interface Round extends MeetingWithSessions {
-  round: number;
-}
 
 /**
  * Adds a round number to each race weekend in the season, sorted in reverse chronological order.
@@ -85,11 +77,6 @@ export function getSessionStatus(session: Session, now: number): SessionStatus {
   return end !== null && now <= end ? "live" : "finished";
 }
 
-export interface FeaturedRound {
-  key: number;
-  kind: "live" | "next";
-}
-
 /**
  * Find the featured round in the season based on the current timestamp. The featured round is either the live round or the next upcoming round.
  */
@@ -106,38 +93,4 @@ export function findFeaturedRound(
       return { key: r.meeting.key, kind: "next" };
   }
   return null;
-}
-
-/**
- * Format an ISO date string into a human-readable format with the day, month, and time in UTC.
- */
-export function formatWhen(iso: string): string {
-  const d = new Date(iso);
-  const day = d.toLocaleDateString("en-GB", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-    timeZone: "UTC",
-  });
-  const time = d.toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "UTC",
-  });
-  return `${day} · ${time} UTC`;
-}
-
-/**
- * Format a date range from two ISO date strings into a human-readable format. If the start and end dates are in the same month, it will display the day range and month. If they are in different months, it will display the full date range with both months.
- */
-export function formatDateRange(start: string, end: string): string {
-  const s = new Date(start);
-  const e = new Date(end);
-  const month = (d: Date) =>
-    d.toLocaleDateString("en-GB", { month: "short", timeZone: "UTC" });
-
-  if (s.getUTCMonth() === e.getUTCMonth()) {
-    return `${s.getUTCDate()}-${e.getUTCDate()} ${month(e)}`;
-  }
-  return `${s.getUTCDate()} ${month(s)} - ${e.getUTCDate()} ${month(e)}`;
 }

@@ -8,14 +8,7 @@ export type WeekendStatus =
 export interface Session {
   key: number;
   name: string;
-  type:
-    | "Practice"
-    | "Qualifying"
-    | "Race"
-    | "Sprint"
-    | "Sprint Qualifying"
-    | "Sprint Shootout"
-    | string;
+  type: SessionType;
   dateStart: string;
   dateEnd: string | null;
 }
@@ -49,3 +42,5 @@ export interface MeetingWithSessions {
 export type SessionTypeFilter = "all" | "Practice" | "Qualifying" | "Race";
 
 export type SessionStatus = "finished" | "live" | "upcoming";
+
+export type SessionType = "Practice" | "Qualifying" | "Race";
