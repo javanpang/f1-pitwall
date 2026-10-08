@@ -7,10 +7,10 @@ vi.mock("../clients/openf1Client.js", () => ({
 
 import { getMeetings, getSessions } from "../clients/openf1Client.js";
 import {
-  getRaceWeekend,
+  getCurrentWeekend,
   resolveActiveSessions,
   resolveTargetMeeting,
-} from "./raceService.js";
+} from "./weekendService.js";
 
 const meeting = (key, start, end) => ({
   meeting_key: key,
@@ -148,7 +148,7 @@ describe("resolveActiveSessions", () => {
     });
   });
 
-  describe("getRaceWeekend", () => {
+  describe("getCurrentWeekend", () => {
     beforeEach(() => vi.resetAllMocks());
 
     it("falls back to the previous year if the new season has no meetings yet", async () => {
@@ -160,7 +160,7 @@ describe("resolveActiveSessions", () => {
       getMeetings.mockResolvedValueOnce([]).mockResolvedValueOnce([lastYear]);
       getSessions.mockResolvedValue([]);
 
-      const result = await getRaceWeekend(new Date("2026-01-01T00:00:00Z"));
+      const result = await getCurrentWeekend(new Date("2026-01-01T00:00:00Z"));
 
       expect(getMeetings).toHaveBeenNthCalledWith(1, { year: 2026 });
       expect(getMeetings).toHaveBeenNthCalledWith(2, { year: 2025 });
@@ -170,7 +170,9 @@ describe("resolveActiveSessions", () => {
     it("returns null when no meetings exist for either year", async () => {
       getMeetings.mockResolvedValue([]);
 
-      expect(await getRaceWeekend(new Date("2026-01-01T00:00:00Z"))).toBeNull();
+      expect(
+        await getCurrentWeekend(new Date("2026-01-01T00:00:00Z")),
+      ).toBeNull();
     });
 
     it("combines meeting and session status and shapes the response", async () => {
@@ -179,7 +181,7 @@ describe("resolveActiveSessions", () => {
       ]);
       getSessions.mockResolvedValue(WEEKEND);
 
-      const result = await getRaceWeekend(new Date("2026-01-02T15:30:00Z"));
+      const result = await getCurrentWeekend(new Date("2026-01-02T15:30:00Z"));
 
       expect(getSessions).toHaveBeenCalledWith({ meeting_key: 1 });
       expect(result.status).toBe("session_live");

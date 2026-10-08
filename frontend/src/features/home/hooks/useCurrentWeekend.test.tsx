@@ -2,15 +2,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
-import { useRaceWeekend } from "./useRaceWeekend.ts";
-import { race } from "../api/race.ts";
-import type { RaceWeekendData } from "../../../shared/types/f1.ts";
+import { useCurrentWeekend } from "./useCurrentWeekend.ts";
+import { weekendApi } from "../api/weekend.ts";
+import type { WeekendData } from "../../../shared/types/f1.ts";
 
-vi.mock("../api/race", () => ({
-  race: { getRaceWeekend: vi.fn() },
+vi.mock("../api/weekend", () => ({
+  weekendApi: { getCurrent: vi.fn() },
 }));
 
-const fixture: RaceWeekendData = {
+const fixture: WeekendData = {
   status: "upcoming",
   meeting: {
     key: 1,
@@ -38,30 +38,30 @@ function createWrapper() {
   );
 }
 
-describe("useRaceWeekend", () => {
+describe("useCurrentWeekend", () => {
   beforeEach(() => vi.resetAllMocks());
 
   it("shares one request between multiple consumers (Home + RaceCard)", async () => {
-    vi.mocked(race.getRaceWeekend).mockResolvedValue(fixture);
+    vi.mocked(weekendApi.getCurrent).mockResolvedValue(fixture);
 
     const { result } = renderHook(
-      () => ({ home: useRaceWeekend(), card: useRaceWeekend() }),
+      () => ({ home: useCurrentWeekend(), card: useCurrentWeekend() }),
       { wrapper: createWrapper() },
     );
 
     await waitFor(() => expect(result.current.card.loading).toBe(false));
 
-    expect(race.getRaceWeekend).toHaveBeenCalledTimes(1);
+    expect(weekendApi.getCurrent).toHaveBeenCalledTimes(1);
     expect(result.current.home.data).toEqual(fixture);
     expect(result.current.card.data).toEqual(fixture);
   });
 
   it("exposes an error message when the request fails", async () => {
-    vi.mocked(race.getRaceWeekend).mockRejectedValue(
+    vi.mocked(weekendApi.getCurrent).mockRejectedValue(
       new Error("Network error"),
     );
 
-    const { result } = renderHook(() => useRaceWeekend(), {
+    const { result } = renderHook(() => useCurrentWeekend(), {
       wrapper: createWrapper(),
     });
 

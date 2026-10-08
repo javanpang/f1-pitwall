@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 
 import { errorHandler } from "./middleware/errorHandler.js";
-import raceRoutes from "./routes/raceRoutes.js";
+import weekendRoutes from "./routes/weekendRoutes.js";
 import seasonRoutes from "./routes/seasonRoutes.js";
 
 export function createApp({ frontendUrl = "http://localhost:5173" } = {}) {
@@ -10,7 +10,7 @@ export function createApp({ frontendUrl = "http://localhost:5173" } = {}) {
 
   app.use(cors({ origin: frontendUrl, credentials: true }));
 
-  app.use("/api/race", raceRoutes);
+  app.use("/api/weekends", weekendRoutes);
   app.use("/api/seasons", seasonRoutes);
 
   app.get("/health", (req, res) => {

@@ -1,9 +1,6 @@
 import { Activity, Clock, MapPin, Radio } from "lucide-react";
-import { useRaceWeekend } from "../hooks/useRaceWeekend.ts";
-import type {
-  RaceSession,
-  RaceWeekendStatus,
-} from "../../../shared/types/f1.ts";
+import { useCurrentWeekend } from "../hooks/useCurrentWeekend.ts";
+import type { Session, WeekendStatus } from "../../../shared/types/f1.ts";
 
 function formatTime(iso: string): string {
   return (
@@ -22,17 +19,17 @@ function formatDateRange(start: string, end: string): string {
   return `${s.getUTCDate()}-${e.getUTCDate()} ${month}`;
 }
 
-function getSessionLabel(session: RaceSession | null): string {
+function getSessionLabel(session: Session | null): string {
   if (!session) return "-";
   return session.name.toUpperCase();
 }
 
-function getSessionSubtext(session: RaceSession | null): string {
+function getSessionSubtext(session: Session | null): string {
   if (!session) return "";
   return formatTime(session.dateStart);
 }
 
-const STATUS_LABEL: Record<RaceWeekendStatus, string> = {
+const STATUS_LABEL: Record<WeekendStatus, string> = {
   session_live: "LIVE NOW",
   between_sessions: "BETWEEN SESSIONS",
   upcoming: "NEXT RACE WEEKEND",
@@ -93,7 +90,7 @@ const TrackPlaceholder = ({ name }: { name: string }) => (
 );
 
 export default function RaceCard() {
-  const { data, loading, error } = useRaceWeekend();
+  const { data, loading, error } = useCurrentWeekend();
 
   const { meeting, nextSession, activeSession, lastSession, status } =
     data ?? {};

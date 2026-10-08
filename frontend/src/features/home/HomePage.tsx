@@ -2,7 +2,7 @@ import { Terminal } from "lucide-react";
 import { Link } from "react-router-dom";
 import RaceCard from "./components/RaceCard.tsx";
 import { useEffect, useState } from "react";
-import { useRaceWeekend } from "./hooks/useRaceWeekend";
+import { useCurrentWeekend } from "./hooks/useCurrentWeekend.ts";
 
 function useCountdown(targetIso: string | null) {
   const [display, setDisplay] = useState("--D --H --M --S");
@@ -32,7 +32,7 @@ function useCountdown(targetIso: string | null) {
 }
 
 export default function Home() {
-  const { data } = useRaceWeekend();
+  const { data } = useCurrentWeekend();
 
   const countdownTarget =
     data?.nextSession?.dateStart ?? data?.activeSession?.dateStart ?? null;
@@ -77,7 +77,7 @@ export default function Home() {
             <div className="flex items-center gap-3 font-mono text-sm">
               <div className="flex items-center gap-4 px-4 py-2 bg-[#00D2BE]/5 border border-[#00D2BE]/20 rounded-sm">
                 <span className="text-[#555] text-xs uppercase tracking-wider">
-                  Race In:
+                  Next Session:
                 </span>
                 <span className="text-[#00D2BE] font-bold w-35 tabular-nums">
                   {countdown}
