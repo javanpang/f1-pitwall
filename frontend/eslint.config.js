@@ -34,6 +34,11 @@ export default defineConfig([
               from: "./src/features",
               except: ["./home"],
             },
+            {
+              target: "./src/features/sessions",
+              from: "./src/features",
+              except: ["./sessions"],
+            },
           ],
         },
       ],
