@@ -1,8 +1,8 @@
 import { Activity, Clock, MapPin, Radio } from "lucide-react";
 import { useCurrentWeekend } from "../hooks/useCurrentWeekend.ts";
 import type { Session, WeekendStatus } from "../../../shared/types/f1.ts";
-import { formatDateRange } from "../../../shared/utils.ts";
-import { formatTime } from "../../../shared/utils.ts";
+import { formatDateRange } from "../../../shared/utils/date.ts";
+import { formatTime } from "../../../shared/utils/date.ts";
 
 function getSessionLabel(session: Session | null): string {
   if (!session) return "-";
