@@ -1,6 +1,8 @@
 import { ArrowLeft } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import Logo from "../../shared/components/Logo";
+import TrackMap from "./components/TrackMap";
+import { FAKE_TRACK } from "./fixtures/fakeTrack";
 
 export default function SessionsPage() {
   const { sessionKey } = useParams<{ sessionKey: string }>();
@@ -27,6 +29,10 @@ export default function SessionsPage() {
         ) : (
           <div>
             <p className="text-center text-muted">Session: {sessionKey}</p>
+            <TrackMap
+              points={FAKE_TRACK}
+              label={`Track map of ${sessionKey}`}
+            />
           </div>
         )}
       </main>
