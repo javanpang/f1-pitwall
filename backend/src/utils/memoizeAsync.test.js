@@ -64,4 +64,18 @@ describe("memoizeAsync", () => {
     await memo();
     expect(fn).toHaveBeenCalledTimes(2);
   });
+
+  it("shares one entry between calls whose custom keys match", async () => {
+    const fn = vi.fn().mockResolvedValue("data");
+    const memo = memoizeAsync(fn, {
+      ttlMs: 1000,
+      key: ({ circuit }) => circuit,
+    });
+
+    await memo({ circuit: 1, session: "a" });
+    await memo({ circuit: 1, session: "b" });
+    await memo({ circuit: 2, session: "a" });
+
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
 });
