@@ -41,4 +41,39 @@ describe("openf1Client", () => {
       status: 503,
     });
   });
+
+  it("returns [] when a session ahs not laps yet", async () => {
+    const { getLaps } = await loadClient(
+      reject(404, { detail: "No results found." }),
+    );
+    await expect(getLaps(1)).resolves.toEqual([]);
+  });
+
+  it("sends location date bounds using OpenF1's range-filter keys", async () => {
+    let seen;
+    const { getLocation } = await loadClient((config) => {
+      seen = config.params;
+      return Promise.resolve({
+        data: [],
+        status: 200,
+        statusText: "OK",
+        headers: {},
+        config,
+      });
+    });
+
+    await getLocation({
+      sessionKey: 9,
+      driverNumber: 1,
+      from: "2026-01-01T00:00:00.000Z",
+      to: "2026-01-01T00:01:00.000Z",
+    });
+
+    expect(seen).toEqual({
+      session_key: 9,
+      driver_number: 1,
+      "date>": "2026-01-01T00:00:00.000Z",
+      "date<": "2026-01-01T00:01:00.000Z",
+    });
+  });
 });

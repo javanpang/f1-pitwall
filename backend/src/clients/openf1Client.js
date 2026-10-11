@@ -41,10 +41,11 @@ async function getList(path, params) {
   }
 }
 
-async function fetchSessions({ year, meeting_key } = {}) {
+async function fetchSessions({ year, meeting_key, session_key } = {}) {
   const params = {};
   if (year) params.year = year;
   if (meeting_key) params.meeting_key = meeting_key;
+  if (session_key) params.session_key = session_key;
 
   return getList("/sessions", params);
 }
@@ -79,6 +80,21 @@ export async function getDrivers(sessionKey) {
     params: { session_key: sessionKey },
   });
   return data;
+}
+
+// ==== Lap & Location Endpoints ====
+
+export async function getLaps(sessionKey) {
+  return getList("/laps", { session_key: sessionKey });
+}
+
+export async function getLocation({ sessionKey, driverNumber, from, to }) {
+  return getList("/location", {
+    session_key: sessionKey,
+    driver_number: driverNumber,
+    "date>": from,
+    "date<": to,
+  });
 }
 
 export const getSessions = memoizeAsync(fetchSessions, { ttlMs: TTL.SESSIONS });
