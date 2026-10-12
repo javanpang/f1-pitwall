@@ -1,17 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { isAxiosError } from "axios";
 import type { WeekendData } from "../../../shared/types/f1.ts";
+import { getErrorMessage } from "../../../shared/api/getErrorMessage.ts";
 import { weekendApi } from "../api/weekend.ts";
 
 interface UseCurrentWeekendResult {
   data: WeekendData | null;
   loading: boolean;
   error: string | null;
-}
-
-function getErrorMessage(error: unknown): string {
-  if (isAxiosError(error)) return error.response?.data?.error ?? error.message;
-  return error instanceof Error ? error.message : "Unknown error";
 }
 
 export function useCurrentWeekend(): UseCurrentWeekendResult {
