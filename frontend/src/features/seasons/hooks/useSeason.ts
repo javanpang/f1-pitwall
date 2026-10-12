@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { season } from "../api/season";
 import type { MeetingWithSessions } from "../../../shared/types/f1";
+import { getErrorMessage } from "../../../shared/api/getErrorMessage";
 
 const EMPTY: MeetingWithSessions[] = [];
 
@@ -17,5 +18,9 @@ export function useSeason(year: number) {
     queryFn: () => season.getSeason(year),
   });
 
-  return { data, loading: isPending, error: error ? error.message : null };
+  return {
+    data,
+    loading: isPending,
+    error: error ? getErrorMessage(error) : null,
+  };
 }
