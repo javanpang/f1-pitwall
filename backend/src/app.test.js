@@ -10,9 +10,14 @@ vi.mock("./services/seasonService.js", () => ({
   getSeason: vi.fn(),
 }));
 
-import { getCurrentWeekend } from "./services/weekendService.js";
+vi.mock("./services/trackService.js", () => ({
+  getTrack: vi.fn(),
+}));
+
 import { createApp } from "./app.js";
+import { getCurrentWeekend } from "./services/weekendService.js";
 import { getSeason } from "./services/seasonService.js";
+import { getTrack } from "./services/trackService.js";
 
 const app = createApp({ frontendUrl: "https://pitwall.example.com" });
 
@@ -134,4 +139,37 @@ describe("GET /api/season/:year", () => {
       expect(getSeason).not.toHaveBeenCalled();
     },
   );
+});
+
+describe("GET /api/sessions/:sessionKey/track", () => {
+  it("returns the track, passing the key as a number, with cache headers", async () => {
+    getTrack.mockResolvedValue({ points: [] });
+
+    const res = await request(app).get("/api/sessions/9161/track");
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ points: [] });
+    expect(getTrack).toHaveBeenCalledWith(9161);
+    expect(res.headers["cache-control"]).toBe("public, max-age=86400");
+  });
+
+  it.each(["abc", "0", "-1", "1.5", "1e3", "0x10", "1234567890"])(
+    "rejects invalid session key %s with a 400 and never calls the service",
+    async (key) => {
+      const res = await request(app).get(`/api/sessions/${key}/track`);
+
+      expect(res.status).toBe(400);
+      expect(getTrack).not.toHaveBeenCalled();
+    },
+  );
+
+  it("passes the service's 404 through without cache headers", async () => {
+    getTrack.mockRejectedValue(new HttpError(404, "Session not found."));
+
+    const res = await request(app).get("/api/sessions/1/track");
+
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({ error: "Session not found." });
+    expect(res.headers["cache-control"]).toBeUndefined();
+  });
 });
