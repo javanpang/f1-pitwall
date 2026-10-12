@@ -1,11 +1,11 @@
 import { ArrowLeft } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
 import Logo from "../../shared/components/Logo";
-import TrackMap from "./components/TrackMap";
-import { FAKE_TRACK } from "./fixtures/fakeTrack";
+import TrackPanel from "./components/TrackPanel";
+import { parseSessionKey } from "./utils/session";
 
 export default function SessionsPage() {
-  const { sessionKey } = useParams<{ sessionKey: string }>();
+  const sessionKey = parseSessionKey(useParams().sessionKey);
 
   return (
     <div className="bg-blueprint flex min-h-screen flex-col bg-carbon-100 text-body">
@@ -25,15 +25,13 @@ export default function SessionsPage() {
 
       <main className="mx-auto w-full max-w-350 grow px-6 pt-8 pb-16">
         {sessionKey === null ? (
-          <p className="text-center text-muted">No session selected</p>
+          <p className="font-mono text-xs tracking-widest text-live uppercase">
+            Invalid session
+          </p>
         ) : (
-          <div>
-            <p className="text-center text-muted">Session: {sessionKey}</p>
-            <TrackMap
-              points={FAKE_TRACK}
-              label={`Track map of ${sessionKey}`}
-            />
-          </div>
+          <>
+            <TrackPanel sessionKey={sessionKey} />
+          </>
         )}
       </main>
     </div>

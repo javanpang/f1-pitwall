@@ -8,7 +8,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/seasons" element={<SeasonsPage />} />
-      <Route path="/sessions/:sessionkey" element={<SessionsPage />} />
+      <Route path="/sessions/:sessionKey" element={<SessionsPage />} />
     </Routes>
   );
 }
