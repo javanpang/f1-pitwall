@@ -1,8 +1,13 @@
 import { ArrowLeft } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
-import Logo from "../../shared/components/Logo";
+
 import TrackPanel from "./components/TrackPanel";
+import { TimingTower } from "./components/TimingTower";
+
+import Logo from "../../shared/components/Logo";
 import { parseSessionKey } from "./utils/session";
+
+import { MOCK_TIMING } from "./api/timing.mock";
 
 export default function SessionsPage() {
   const sessionKey = parseSessionKey(useParams().sessionKey);
@@ -23,15 +28,23 @@ export default function SessionsPage() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-350 grow px-6 pt-8 pb-16">
+      <main className="mx-auto w-full max-w-450 grow px-6 pt-8 pb-16">
         {sessionKey === null ? (
           <p className="font-mono text-xs tracking-widest text-live uppercase">
             Invalid session
           </p>
         ) : (
-          <>
-            <TrackPanel sessionKey={sessionKey} />
-          </>
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,860px)_minmax(0,1fr)]">
+            {/* Timing Tower: top left */}
+            <aside className="min-w-0 xl:row-span-2">
+              <TimingTower rows={MOCK_TIMING} />
+            </aside>
+
+            {/* Track Panel: top right */}
+            <section className="min-w-0">
+              <TrackPanel sessionKey={sessionKey} />
+            </section>
+          </div>
         )}
       </main>
     </div>
