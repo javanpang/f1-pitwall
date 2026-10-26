@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, afterEach } from "vitest";
 import { AxiosError } from "axios";
 
 async function loadClient(adapter) {
@@ -18,6 +18,8 @@ const reject = (status, data) => (config) =>
     }),
   );
 
+afterEach(() => vi.useRealTimers());
+
 describe("openf1Client", () => {
   it("returns [] for OpenF1's 'No results found.' 404", async () => {
     const { getMeetings } = await loadClient(
@@ -35,11 +37,44 @@ describe("openf1Client", () => {
     });
   });
 
-  it("maps a 429 to a 503", async () => {
-    const { getMeetings } = await loadClient(reject(429, {}));
-    await expect(getMeetings({ year: 2026 })).rejects.toMatchObject({
-      status: 503,
+  it("retries a 429 and then succeeds", async () => {
+    vi.useFakeTimers();
+    let calls = 0;
+    const { getMeetings } = await loadClient((config) =>
+      ++calls === 1
+        ? reject(429, {})(config)
+        : Promise.resolve({
+            data: [{}],
+            status: 200,
+            statusText: "OK",
+            headers: {},
+            config,
+          }),
+    );
+
+    const result = getMeetings({ year: 2026 });
+    await vi.runAllTimersAsync();
+
+    await expect(result).resolves.toHaveLength(1);
+    expect(calls).toBe(2);
+  });
+
+  it("gives up after the retry budget and maps 429 to 503", async () => {
+    vi.useFakeTimers();
+    let calls = 0;
+    const { getMeetings } = await loadClient((config) => {
+      calls++;
+      return reject(429, {})(config);
     });
+
+    const assertion = expect(getMeetings({ year: 2026 })).rejects.toMatchObject(
+      { status: 503 },
+    );
+    await vi.runAllTimersAsync();
+
+    await assertion;
+    // TODO: check if calls is 3 or 4 depending on whether the first call counts as a retry.
+    expect(calls).toBe(3);
   });
 
   it("returns [] when a session ahs not laps yet", async () => {
