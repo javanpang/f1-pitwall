@@ -1,6 +1,13 @@
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
+
+import { createApp } from "./app.js";
 import { HttpError } from "./errors/httpError.js";
+
+import { getCurrentWeekend } from "./services/weekendService.js";
+import { getSeason } from "./services/seasonService.js";
+import { getTrack } from "./services/trackService.js";
+import { getTiming } from "./services/timingService.js";
 
 vi.mock("./services/weekendService.js", () => ({
   getCurrentWeekend: vi.fn(),
@@ -14,10 +21,9 @@ vi.mock("./services/trackService.js", () => ({
   getTrack: vi.fn(),
 }));
 
-import { createApp } from "./app.js";
-import { getCurrentWeekend } from "./services/weekendService.js";
-import { getSeason } from "./services/seasonService.js";
-import { getTrack } from "./services/trackService.js";
+vi.mock("./services/timingService.js", () => ({
+  getTiming: vi.fn(),
+}));
 
 const app = createApp({ frontendUrl: "https://pitwall.example.com" });
 
@@ -171,5 +177,39 @@ describe("GET /api/sessions/:sessionKey/track", () => {
     expect(res.status).toBe(404);
     expect(res.body).toEqual({ error: "Session not found." });
     expect(res.headers["cache-control"]).toBeUndefined();
+  });
+});
+
+describe("GET /api/sessions/:sessionKey/timing", () => {
+  it("returns timing rows, passing the key as a number", async () => {
+    getTiming.mockResolvedValue({
+      rows: [{ position: 1, code: "VER" }],
+      finished: false,
+    });
+
+    const res = await request(app).get("/api/sessions/9158/timing");
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([{ position: 1, code: "VER" }]);
+    expect(getTiming).toHaveBeenCalledWith(9158, null);
+  });
+
+  it.each(["abc", "0", "-1", "1.5", "1e3", "0x10", "1234567890"])(
+    "rejects invalid session key %s with a 400 and never calls the service",
+    async (key) => {
+      const res = await request(app).get(`/api/sessions/${key}/timing`);
+
+      expect(res.status).toBe(400);
+      expect(getTiming).not.toHaveBeenCalled();
+    },
+  );
+
+  it("passes the service's 404 through", async () => {
+    getTiming.mockRejectedValue(new HttpError(404, "Session not found."));
+
+    const res = await request(app).get("/api/sessions/1/timing");
+
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({ error: "Session not found." });
   });
 });
