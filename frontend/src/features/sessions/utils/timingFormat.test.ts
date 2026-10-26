@@ -10,14 +10,14 @@ describe("formatLapTime", () => {
     expect(formatLapTime(59.9996)).toBe("1:00.000");
   });
   it("returns a dash for missing times", () => {
-    expect(formatLapTime(null)).toBe("—");
+    expect(formatLapTime(null)).toBe("-");
   });
 });
 
 describe("formatSector", () => {
   it("always shows three decimals", () => {
     expect(formatSector(28.4)).toBe("28.400");
-    expect(formatSector(null)).toBe("—");
+    expect(formatSector(null)).toBe("-");
   });
 });
 
