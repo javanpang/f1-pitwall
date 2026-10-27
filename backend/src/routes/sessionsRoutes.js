@@ -2,6 +2,7 @@ import { Router } from "express";
 import { HttpError } from "../errors/httpError.js";
 import { getTrack } from "../services/trackService.js";
 import { getTiming } from "../services/timingService.js";
+import { getSessionDetails } from "../services/sessionService.js";
 
 const SESSION_KEY_PATTERN = /^[1-9]\d{0,8}$/;
 
@@ -22,6 +23,15 @@ function parseAt(raw) {
   }
   return ms;
 }
+
+// GET /api/sessions/:sessionKey
+router.get("/:sessionKey", async (req, res) => {
+  const detail = await getSessionDetails(Number(req.params.sessionKey));
+
+  const finished = Date.parse(detail.session.dateEnd) < Date.now();
+  res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
+  res.json(detail.session);
+});
 
 // GET /api/sessions/:sessionKey/track
 router.get("/:sessionKey/track", async (req, res) => {

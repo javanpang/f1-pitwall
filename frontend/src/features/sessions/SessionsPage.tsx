@@ -4,17 +4,18 @@ import { Link, useParams } from "react-router-dom";
 import Logo from "../../shared/components/Logo";
 
 import TrackPanel from "./components/TrackPanel";
-import { TimingPanel } from "./components/TimingPanel";
 import ReplayControls from "./components/ReplayControls";
-import { parseSessionKey } from "./utils/session";
+import { ReplayTimingPanel } from "./components/ReplayTimingPanel";
 import { useReplaySession } from "./hooks/useReplay";
-
-// TODO: derive from the session's dateStart/dateEnd
-const PLACEHOLDER_DURATION_MS = 90 * 60 * 1000;
+import { useSession } from "./hooks/useSession";
+import { parseSessionKey, sessionWindow } from "./utils/session";
 
 export default function SessionsPage() {
   const sessionKey = parseSessionKey(useParams().sessionKey);
-  useReplaySession(sessionKey, PLACEHOLDER_DURATION_MS);
+  const { data: session } = useSession(sessionKey);
+  const window = sessionWindow(session);
+
+  useReplaySession(sessionKey, window?.durationMs ?? 0);
 
   return (
     <div className="bg-blueprint flex min-h-dvh flex-col bg-carbon-100 text-body xl:h-dvh xl:overflow-hidden">
@@ -42,7 +43,12 @@ export default function SessionsPage() {
             <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[minmax(0,860px)_minmax(0,1fr)]">
               {/* Timing Tower: top left */}
               <section className="min-h-0 min-w-0">
-                <TimingPanel sessionKey={sessionKey} />
+                {window && (
+                  <ReplayTimingPanel
+                    sessionKey={sessionKey}
+                    startMs={window.startMs}
+                  />
+                )}
               </section>
 
               {/* Track Panel: top right */}
