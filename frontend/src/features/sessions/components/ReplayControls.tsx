@@ -3,25 +3,16 @@ import { Pause, Play } from "lucide-react";
 
 import SegmentedControl from "../../../shared/components/SegmentedControl.tsx";
 
-import type { ReplaySpeed } from "../utils/replay.ts";
 import {
   ratioFromPointer,
   positionFromKey,
   formatElapsed,
   SPEED_OPTIONS,
 } from "../utils/replay.ts";
+import { useReplayStore } from "../stores/replayStore.ts";
+import { useReplayPosition } from "../hooks/useReplay.ts";
 
 const clamp01 = (n: number) => Math.min(Math.max(n, 0), 1);
-
-interface ReplayControlsProps {
-  playing: boolean;
-  speed: ReplaySpeed;
-  position: number;
-  duration: number;
-  onTogglePlay: () => void;
-  onSpeedChange: (speed: ReplaySpeed) => void;
-  onSeek: (ms: number) => void;
-}
 
 interface TimelineProps {
   position: number;
@@ -95,15 +86,16 @@ export function Timeline({
   );
 }
 
-export default function ReplayControls({
-  playing,
-  speed,
-  position,
-  duration,
-  onTogglePlay,
-  onSpeedChange,
-  onSeek,
-}: ReplayControlsProps) {
+export default function ReplayControls() {
+  const playing = useReplayStore((s) => s.playing);
+  const speed = useReplayStore((s) => s.speed);
+  const duration = useReplayStore((s) => s.duration);
+
+  const toggle = useReplayStore((s) => s.toggle);
+  const setSpeed = useReplayStore((s) => s.setSpeed);
+  const seek = useReplayStore((s) => s.seek);
+
+  const position = useReplayPosition();
   const disabled = duration <= 0;
 
   return (
@@ -111,7 +103,7 @@ export default function ReplayControls({
       {/* Play/Pause Button */}
       <button
         type="button"
-        onClick={onTogglePlay}
+        onClick={toggle}
         disabled={disabled}
         aria-label={playing ? "Pause replay" : "Play replay"}
         className="flex size-9 cursor-pointer items-center justify-center rounded-sm bg-accent text-carbon-100 transition-colors hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40"
@@ -124,7 +116,7 @@ export default function ReplayControls({
         label="Replay speed"
         options={[...SPEED_OPTIONS]}
         value={speed}
-        onChange={onSpeedChange}
+        onChange={setSpeed}
       />
 
       {/* Bar */}
@@ -132,7 +124,7 @@ export default function ReplayControls({
         position={position}
         duration={duration}
         disabled={disabled}
-        onSeek={onSeek}
+        onSeek={seek}
       />
 
       {/* Clock */}

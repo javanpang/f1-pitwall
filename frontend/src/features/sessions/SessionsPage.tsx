@@ -7,14 +7,14 @@ import TrackPanel from "./components/TrackPanel";
 import { TimingPanel } from "./components/TimingPanel";
 import ReplayControls from "./components/ReplayControls";
 import { parseSessionKey } from "./utils/session";
-import { useReplayClock } from "./hooks/useReplayClock";
+import { useReplaySession } from "./hooks/useReplay";
 
 // TODO: derive from the session's dateStart/dateEnd
 const PLACEHOLDER_DURATION_MS = 90 * 60 * 1000;
 
 export default function SessionsPage() {
   const sessionKey = parseSessionKey(useParams().sessionKey);
-  const clock = useReplayClock(PLACEHOLDER_DURATION_MS);
+  useReplaySession(sessionKey, PLACEHOLDER_DURATION_MS);
 
   return (
     <div className="bg-blueprint flex min-h-dvh flex-col bg-carbon-100 text-body xl:h-dvh xl:overflow-hidden">
@@ -52,15 +52,7 @@ export default function SessionsPage() {
             </div>
 
             {/* Replay Controls: bottom */}
-            <ReplayControls
-              playing={clock.playing}
-              speed={clock.speed}
-              position={clock.position}
-              duration={PLACEHOLDER_DURATION_MS}
-              onTogglePlay={clock.togglePlay}
-              onSpeedChange={clock.setSpeed}
-              onSeek={clock.seek}
-            />
+            <ReplayControls />
           </>
         )}
       </main>
