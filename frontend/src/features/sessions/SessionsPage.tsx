@@ -12,10 +12,14 @@ import { parseSessionKey, sessionWindow } from "./utils/session";
 
 export default function SessionsPage() {
   const sessionKey = parseSessionKey(useParams().sessionKey);
-  const { data: session } = useSession(sessionKey);
-  const window = sessionWindow(session);
+  const {
+    data: session,
+    loading: sessionLoading,
+    error: sessionError,
+  } = useSession(sessionKey);
+  const replayWindow = sessionWindow(session);
 
-  useReplaySession(sessionKey, window?.durationMs ?? 0);
+  useReplaySession(sessionKey, replayWindow?.durationMs ?? 0);
 
   return (
     <div className="bg-blueprint flex min-h-dvh flex-col bg-carbon-100 text-body xl:h-dvh xl:overflow-hidden">
@@ -43,11 +47,24 @@ export default function SessionsPage() {
             <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[minmax(0,860px)_minmax(0,1fr)]">
               {/* Timing Tower: top left */}
               <section className="min-h-0 min-w-0">
-                {window && (
+                {replayWindow ? (
                   <ReplayTimingPanel
                     sessionKey={sessionKey}
-                    startMs={window.startMs}
+                    startMs={replayWindow.startMs}
                   />
+                ) : sessionLoading ? (
+                  <div
+                    role="status"
+                    aria-label="Loading session"
+                    className="h-96 animate-pulse border border-carbon-300 bg-carbon-200"
+                  />
+                ) : (
+                  <div
+                    role="alert"
+                    className="border border-live/40 bg-carbon-200 p-4 font-mono text-sm text-live"
+                  >
+                    {sessionError ?? "Replay is unavailable for this session."}
+                  </div>
                 )}
               </section>
 

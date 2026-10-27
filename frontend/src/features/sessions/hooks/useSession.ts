@@ -14,6 +14,7 @@ export function useSession(sessionKey: number | null) {
 
   return {
     data: query.data ?? null,
-    error: query.error ?? getErrorMessage(query.error),
+    loading: query.isPending && sessionKey !== null,
+    error: query.error ? getErrorMessage(query.error) : null,
   };
 }

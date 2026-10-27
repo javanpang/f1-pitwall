@@ -1,9 +1,9 @@
 import { apiClient } from "../../../shared/api/client";
 
 export interface SessionDetails {
-  sessionKey: number;
-  sessionName: string;
-  meetingKey: number;
+  key: number;
+  name: string;
+  type: string;
   dateStart: string;
   dateEnd: string;
 }
