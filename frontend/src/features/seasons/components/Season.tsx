@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
-import SegmentedControl from "./SegmentedControl.tsx";
+
 import { useNow } from "../hooks/useNow.ts";
 import { useSeason } from "../hooks/useSeason.ts";
 import type { SessionTypeFilter } from "../types.ts";
@@ -13,6 +13,9 @@ import {
   getVisibleColumns,
   withRounds,
 } from "../utils/season.ts";
+
+import SegmentedControl from "../../../shared/components/SegmentedControl.tsx";
+
 import SeasonTable from "./SeasonTable.tsx";
 
 /**
