@@ -90,7 +90,7 @@ export function TimingTower({ rows }: TimingTowerProps) {
                 <th
                   key={i}
                   scope="col"
-                  className="whitespace-nowrap px-2 py-2 font-mono text-[10px] font-medium tracking-widest text-muted uppercase"
+                  className="whitespace-nowrap px-1 py-1 font-mono text-[10px] font-medium tracking-widest text-muted uppercase"
                 >
                   {header}
                 </th>
@@ -103,7 +103,9 @@ export function TimingTower({ rows }: TimingTowerProps) {
                 key={row.driverNumber}
                 className="transition-colors hover:bg-accent/5"
               >
-                <td className="px-1 font-mono text-body">{row.position}</td>
+                <td className="w-7 px-0.5 font-mono text-body">
+                  {row.position}
+                </td>
                 <td>
                   <ChangeIcon change={row.positionChange} />
                 </td>
@@ -114,9 +116,9 @@ export function TimingTower({ rows }: TimingTowerProps) {
                       style={{ backgroundColor: row.teamColour }}
                       aria-hidden="true"
                     />
-                    <div className="min-w-0 leading-tight">
+                    <div className="flex min-w-0 items-center gap-2 leading-tight">
                       <div className="font-mono text-sm font-bold tracking-wider text-body">
-                        {row.driverAcronym}
+                        {row.nameAcronym}
                       </div>
                       <div className="truncate text-[11px] text-muted">
                         {row.teamName}
@@ -125,7 +127,7 @@ export function TimingTower({ rows }: TimingTowerProps) {
                   </div>
                 </td>
                 <td className="px-1 py-1 font-mono text-body">
-                  {formatInterval(row.intervalSeconds)}
+                  {formatInterval(row.intervalSeconds, row.position === 1)}
                 </td>
                 {row.sectors.map((s, i) => (
                   <td

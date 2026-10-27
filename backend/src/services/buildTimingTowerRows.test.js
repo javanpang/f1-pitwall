@@ -134,6 +134,19 @@ describe("buildTimingTowerRows", () => {
     expect(byDriver(build(data), 1).teamColour).toBe("#9CA3AF");
   });
 
+  it("counts completed untimed laps towards tyre age", () => {
+    const data = fixture({
+      laps: [
+        lap(1, 1, 0, null, [null, null, null]),
+        lap(1, 2, 90, 85, [28, 29, 28]),
+      ],
+    });
+    const row = byDriver(build(data, at(100)), 1);
+
+    expect(row.lastLap.seconds).toBeNull();
+    expect(row.tyre).toEqual({ compound: "SOFT", ageLaps: 0 });
+  });
+
   it("reports 'default' best-lap status and null tyre when a driver has no data", () => {
     const row = byDriver(build(fixture({ laps: [], stints: [] })), 1);
 

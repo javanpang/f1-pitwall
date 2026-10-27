@@ -4,6 +4,8 @@ import { getTrack } from "../services/trackService.js";
 import { getTiming } from "../services/timingService.js";
 
 const SESSION_KEY_PATTERN = /^[1-9]\d{0,8}$/;
+const ISO_TIMESTAMP_PATTERN =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:\d{2})$/;
 
 const router = Router();
 
@@ -16,7 +18,10 @@ router.param("sessionKey", (req, res, next, raw) => {
 
 function parseAt(raw) {
   if (raw === undefined) return null;
-  const ms = typeof raw === "string" ? Date.parse(raw) : NaN;
+  const ms =
+    typeof raw === "string" && ISO_TIMESTAMP_PATTERN.test(raw)
+      ? Date.parse(raw)
+      : NaN;
   if (!Number.isFinite(ms)) {
     throw new HttpError(400, "`at` must be an ISO 8601 timestamp.");
   }

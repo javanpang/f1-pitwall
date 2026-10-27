@@ -28,10 +28,13 @@ export function memoizeAsync(
     if (hit && hit.expires > Date.now()) return hit.value;
 
     const promise = fn(...args).catch((error) => {
-      cache.delete(cacheKey);
+      // Only evict if a newer call hasn't replaced this entry.
+      if (cache.get(cacheKey)?.value === promise) cache.delete(cacheKey);
       throw error;
     });
 
+    // Delete first so a refreshed key moves to the end of the eviction order.
+    cache.delete(cacheKey);
     cache.set(cacheKey, { value: promise, expires: Date.now() + ttlMs });
 
     if (cache.size > maxEntries) evict();

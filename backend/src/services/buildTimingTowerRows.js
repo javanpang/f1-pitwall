@@ -154,11 +154,11 @@ export function buildTimingTowerRows(index, at = null) {
       };
     });
 
-    const lapInProgress = (lastLap?.lapNumber ?? 0) + 1;
+    const currentLapNumber = lapsDone.at(-1)?.lapNumber ?? null;
+    const lapInProgress = (currentLapNumber ?? 0) + 1;
     const latestStint = entry.stints
       .filter((s) => at === null || s.lap_start <= lapInProgress)
       .at(-1);
-    const currentLapNumber = lastLap?.lapNumber ?? null;
     const ageLaps =
       latestStint &&
       isNumber(latestStint.tyre_age_at_start) &&
@@ -176,7 +176,7 @@ export function buildTimingTowerRows(index, at = null) {
     return {
       position: current,
       driverNumber: driver.driver_number,
-      code: driver.name_acronym,
+      nameAcronym: driver.name_acronym,
       teamName: driver.team_name,
       teamColour: driver.team_colour
         ? `#${driver.team_colour}`

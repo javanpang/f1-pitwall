@@ -78,4 +78,41 @@ describe("memoizeAsync", () => {
 
     expect(fn).toHaveBeenCalledTimes(2);
   });
+
+  it("keeps a newer entry when an expired in-flight call rejects late", async () => {
+    let rejectFirst;
+    const fn = vi
+      .fn()
+      .mockImplementationOnce(
+        () => new Promise((_, reject) => (rejectFirst = reject)),
+      )
+      .mockResolvedValue("fresh");
+    const memo = memoizeAsync(fn, { ttlMs: 1000 });
+
+    const first = memo();
+    vi.advanceTimersByTime(1001);
+    await memo();
+
+    rejectFirst(new Error("late"));
+    await expect(first).rejects.toThrow("late");
+
+    await memo();
+    expect(fn).toHaveBeenCalledTimes(2);
+  });
+
+  it("moves a refreshed key to the back of the eviction order", async () => {
+    const fn = vi.fn(async (id) => id);
+    const memo = memoizeAsync(fn, { ttlMs: 1000, maxEntries: 2 });
+
+    await memo("a");
+    vi.advanceTimersByTime(500);
+    await memo("b");
+    vi.advanceTimersByTime(501);
+    await memo("a"); // "a" expired and is refreshed
+    await memo("c"); // over capacity: "b" is now the oldest
+
+    fn.mockClear();
+    await memo("a");
+    expect(fn).not.toHaveBeenCalled();
+  });
 });
