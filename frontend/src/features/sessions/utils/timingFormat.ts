@@ -17,9 +17,10 @@ export function formatSector(seconds: number | null): string {
   return seconds === null ? EMPTY : seconds.toFixed(3);
 }
 
-/** Format interval time. Null means leader. */
-export function formatInterval(seconds: number | null): string {
-  return seconds === null ? "LEADER" : `+${seconds.toFixed(3)}`;
+/** Format interval time. Null means no gap is known. */
+export function formatInterval(seconds: number | null, isLeader: boolean): string {
+  if (isLeader) return "LEADER";
+  return seconds === null ? EMPTY : `+${seconds.toFixed(3)}`;
 }
 
 export const TYRE_CONFIG: Record<
@@ -38,5 +39,5 @@ export const TYRE_CONFIG: Record<
 export const TIME_STATUS_CLASS: Record<TimeStatus, string> = {
   "overall-best": "text-purple-400",
   "personal-best": "text-green-400",
-  "no-time": "text-yellow-300",
+  default: "text-body",
 };

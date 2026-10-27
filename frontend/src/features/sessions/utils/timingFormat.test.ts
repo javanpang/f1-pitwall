@@ -22,8 +22,11 @@ describe("formatSector", () => {
 });
 
 describe("formatInterval", () => {
-  it("shows LEADER for null and a plus-prefixed gap otherwise", () => {
-    expect(formatInterval(null)).toBe("LEADER");
-    expect(formatInterval(0.482)).toBe("+0.482");
+  it("shows LEADER for the leader and a plus-prefixed gap otherwise", () => {
+    expect(formatInterval(null, true)).toBe("LEADER");
+    expect(formatInterval(0.482, false)).toBe("+0.482");
+  });
+  it("shows a dash for a non-leader with no known gap", () => {
+    expect(formatInterval(null, false)).toBe("-");
   });
 });

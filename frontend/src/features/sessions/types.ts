@@ -18,7 +18,7 @@ export type TyreCompound =
   | "WET"
   | "UNKNOWN";
 
-export type TimeStatus = "overall-best" | "personal-best" | "no-time";
+export type TimeStatus = "overall-best" | "personal-best" | "default";
 
 export type PositionChange = "up" | "down" | "none";
 
@@ -30,7 +30,7 @@ export interface SectorTime {
 export interface TimingRow {
   position: number;
   driverNumber: number;
-  driverAcronym: string;
+  nameAcronym: string;
   teamName: string;
   teamColour: string;
   positionChange: PositionChange;

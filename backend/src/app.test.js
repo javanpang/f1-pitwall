@@ -204,6 +204,29 @@ describe("GET /api/sessions/:sessionKey/timing", () => {
     },
   );
 
+  it("parses an ISO 8601 `at` with a timezone", async () => {
+    getTiming.mockResolvedValue({ rows: [], finished: true });
+
+    const res = await request(app).get(
+      "/api/sessions/1/timing?at=2026-03-01T15:00:00Z",
+    );
+
+    expect(res.status).toBe(200);
+    expect(getTiming).toHaveBeenCalledWith(1, Date.UTC(2026, 2, 1, 15));
+  });
+
+  it.each(["2026", "March 1 2026", "10/27/2026", "2026-03-01T15:00:00"])(
+    "rejects non-ISO or timezone-less `at` %s with a 400",
+    async (at) => {
+      const res = await request(app).get(
+        `/api/sessions/1/timing?at=${encodeURIComponent(at)}`,
+      );
+
+      expect(res.status).toBe(400);
+      expect(getTiming).not.toHaveBeenCalled();
+    },
+  );
+
   it("passes the service's 404 through", async () => {
     getTiming.mockRejectedValue(new HttpError(404, "Session not found."));
 
