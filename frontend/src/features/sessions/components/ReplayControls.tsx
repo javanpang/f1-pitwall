@@ -4,6 +4,7 @@ import { Pause, Play } from "lucide-react";
 import SegmentedControl from "../../../shared/components/SegmentedControl.tsx";
 
 import {
+  clamp01,
   ratioFromPointer,
   positionFromKey,
   formatElapsed,
@@ -11,8 +12,6 @@ import {
 } from "../utils/replay.ts";
 import { useReplayStore } from "../stores/replayStore.ts";
 import { useReplayPosition } from "../hooks/useReplay.ts";
-
-const clamp01 = (n: number) => Math.min(Math.max(n, 0), 1);
 
 interface TimelineProps {
   position: number;
@@ -86,6 +85,34 @@ export function Timeline({
   );
 }
 
+function ReplayTimeline({
+  duration,
+  disabled,
+}: Pick<TimelineProps, "duration" | "disabled">) {
+  const position = useReplayPosition();
+  const seek = useReplayStore((s) => s.seek);
+
+  return (
+    <Timeline
+      position={position}
+      duration={duration}
+      disabled={disabled}
+      onSeek={seek}
+    />
+  );
+}
+
+function ReplayClock({ duration }: { duration: number }) {
+  const position = useReplayPosition(1_000);
+
+  return (
+    <div className="shrink-0 font-mono text-xs whitespace-nowrap tabular-nums">
+      <span className="text-body">{formatElapsed(position)}</span>
+      <span className="text-faint"> / {formatElapsed(duration)}</span>
+    </div>
+  );
+}
+
 export default function ReplayControls() {
   const playing = useReplayStore((s) => s.playing);
   const speed = useReplayStore((s) => s.speed);
@@ -93,9 +120,7 @@ export default function ReplayControls() {
 
   const toggle = useReplayStore((s) => s.toggle);
   const setSpeed = useReplayStore((s) => s.setSpeed);
-  const seek = useReplayStore((s) => s.seek);
 
-  const position = useReplayPosition();
   const disabled = duration <= 0;
 
   return (
@@ -120,18 +145,10 @@ export default function ReplayControls() {
       />
 
       {/* Bar */}
-      <Timeline
-        position={position}
-        duration={duration}
-        disabled={disabled}
-        onSeek={seek}
-      />
+      <ReplayTimeline duration={duration} disabled={disabled} />
 
       {/* Clock */}
-      <div className="shrink-0 font-mono text-xs whitespace-nowrap tabular-nums">
-        <span className="text-body">{formatElapsed(position)}</span>
-        <span className="text-faint"> / {formatElapsed(duration)}</span>
-      </div>
+      <ReplayClock duration={duration} />
     </section>
   );
 }

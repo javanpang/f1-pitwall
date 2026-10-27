@@ -26,11 +26,11 @@ function parseAt(raw) {
 
 // GET /api/sessions/:sessionKey
 router.get("/:sessionKey", async (req, res) => {
-  const detail = await getSessionDetails(Number(req.params.sessionKey));
+  const session = await getSessionDetails(Number(req.params.sessionKey));
 
-  const finished = Date.parse(detail.session.dateEnd) < Date.now();
+  const finished = Date.parse(session.dateEnd) < Date.now();
   res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
-  res.json(detail.session);
+  res.json(session);
 });
 
 // GET /api/sessions/:sessionKey/track
