@@ -14,7 +14,7 @@ export function TimingPanel({
 }: TimingPanelProps) {
   const { data, loading, error } = useTiming(sessionKey, { live, at });
 
-  if (loading) {
+  if (loading && !data) {
     return (
       <div
         role="status"

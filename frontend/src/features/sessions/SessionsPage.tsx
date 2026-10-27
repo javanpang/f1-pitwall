@@ -4,17 +4,22 @@ import { Link, useParams } from "react-router-dom";
 import Logo from "../../shared/components/Logo";
 
 import TrackPanel from "./components/TrackPanel";
-import { TimingPanel } from "./components/TimingPanel";
 import ReplayControls from "./components/ReplayControls";
-import { parseSessionKey } from "./utils/session";
-import { useReplayClock } from "./hooks/useReplayClock";
-
-// TODO: derive from the session's dateStart/dateEnd
-const PLACEHOLDER_DURATION_MS = 90 * 60 * 1000;
+import { ReplayTimingPanel } from "./components/ReplayTimingPanel";
+import { useReplaySession } from "./hooks/useReplay";
+import { useSession } from "./hooks/useSession";
+import { parseSessionKey, sessionWindow } from "./utils/session";
 
 export default function SessionsPage() {
   const sessionKey = parseSessionKey(useParams().sessionKey);
-  const clock = useReplayClock(PLACEHOLDER_DURATION_MS);
+  const {
+    data: session,
+    loading: sessionLoading,
+    error: sessionError,
+  } = useSession(sessionKey);
+  const replayWindow = sessionWindow(session);
+
+  useReplaySession(sessionKey, replayWindow?.durationMs ?? 0);
 
   return (
     <div className="bg-blueprint flex min-h-dvh flex-col bg-carbon-100 text-body xl:h-dvh xl:overflow-hidden">
@@ -42,7 +47,25 @@ export default function SessionsPage() {
             <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[minmax(0,860px)_minmax(0,1fr)]">
               {/* Timing Tower: top left */}
               <section className="min-h-0 min-w-0">
-                <TimingPanel sessionKey={sessionKey} />
+                {replayWindow ? (
+                  <ReplayTimingPanel
+                    sessionKey={sessionKey}
+                    startMs={replayWindow.startMs}
+                  />
+                ) : sessionLoading ? (
+                  <div
+                    role="status"
+                    aria-label="Loading session"
+                    className="h-96 animate-pulse border border-carbon-300 bg-carbon-200"
+                  />
+                ) : (
+                  <div
+                    role="alert"
+                    className="border border-live/40 bg-carbon-200 p-4 font-mono text-sm text-live"
+                  >
+                    {sessionError ?? "Replay is unavailable for this session."}
+                  </div>
+                )}
               </section>
 
               {/* Track Panel: top right */}
@@ -52,15 +75,7 @@ export default function SessionsPage() {
             </div>
 
             {/* Replay Controls: bottom */}
-            <ReplayControls
-              playing={clock.playing}
-              speed={clock.speed}
-              position={clock.position}
-              duration={PLACEHOLDER_DURATION_MS}
-              onTogglePlay={clock.togglePlay}
-              onSpeedChange={clock.setSpeed}
-              onSeek={clock.seek}
-            />
+            <ReplayControls />
           </>
         )}
       </main>

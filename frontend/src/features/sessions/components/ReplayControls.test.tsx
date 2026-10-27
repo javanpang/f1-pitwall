@@ -1,53 +1,77 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import ReplayControls, { Timeline } from "./ReplayControls";
+import { useReplayStore } from "../stores/replayStore";
 
-beforeEach(() => vi.clearAllMocks());
-afterEach(cleanup);
+const store = () => useReplayStore.getState();
 
-const props = {
-  playing: false,
-  speed: 1 as const,
-  position: 65_000,
-  duration: 3_600_000,
-  onTogglePlay: vi.fn(),
-  onSpeedChange: vi.fn(),
-  onSeek: vi.fn(),
-};
+beforeEach(() => {
+  vi.useFakeTimers({
+    toFake: ["requestAnimationFrame", "cancelAnimationFrame", "performance"],
+  });
+  store().reset();
+});
+
+afterEach(() => {
+  cleanup();
+  store().reset();
+  vi.useRealTimers();
+});
+
+function loadSession() {
+  store().setDuration(3_600_000);
+  store().seek(65_000);
+}
 
 describe("ReplayControls", () => {
-  it("toggles play and reflects state in its label", () => {
-    const { rerender } = render(<ReplayControls {...props} />);
-    fireEvent.click(screen.getByRole("button", { name: "Play replay" }));
-    expect(props.onTogglePlay).toHaveBeenCalledTimes(1);
+  it("toggles playback and reflects it in the button label", () => {
+    loadSession();
+    render(<ReplayControls />);
 
-    rerender(<ReplayControls {...props} playing />);
+    fireEvent.click(screen.getByRole("button", { name: "Play replay" }));
+
+    expect(store().playing).toBe(true);
     expect(
       screen.getByRole("button", { name: "Pause replay" }),
     ).toBeInTheDocument();
   });
 
-  it("reports the selected speed", () => {
-    render(<ReplayControls {...props} />);
+  it("sets the replay speed", () => {
+    loadSession();
+    render(<ReplayControls />);
+
     fireEvent.click(screen.getByRole("button", { name: "4x" }));
-    expect(props.onSpeedChange).toHaveBeenCalledWith(4);
+
+    expect(store().speed).toBe(4);
   });
 
   it("seeks from the timeline with the keyboard", () => {
-    render(<ReplayControls {...props} />);
+    loadSession();
+    render(<ReplayControls />);
+
     fireEvent.keyDown(screen.getByRole("slider", { name: "Replay position" }), {
       key: "ArrowRight",
     });
-    expect(props.onSeek).toHaveBeenCalledWith(70_000); // 65_000 + 5_000 step
+
+    expect(store().position).toBe(70_000); // 65_000 + 5_000 step
+  });
+
+  it("shows the current position and duration", () => {
+    loadSession();
+    render(<ReplayControls />);
+
+    expect(screen.getByText("1:05")).toBeInTheDocument();
   });
 
   it("disables everything when there is no duration", () => {
-    render(<ReplayControls {...props} duration={0} />);
-    expect(screen.getByRole("button", { name: "Play replay" })).toBeDisabled();
-    expect(screen.getByRole("slider")).toHaveAttribute("aria-disabled", "true");
+    render(<ReplayControls />);
 
-    fireEvent.keyDown(screen.getByRole("slider"), { key: "ArrowRight" });
-    expect(props.onSeek).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Play replay" })).toBeDisabled();
+    const slider = screen.getByRole("slider");
+    expect(slider).toHaveAttribute("aria-disabled", "true");
+
+    fireEvent.keyDown(slider, { key: "ArrowRight" });
+    expect(store().position).toBe(0);
   });
 });
 
