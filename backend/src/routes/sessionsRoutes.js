@@ -2,6 +2,7 @@ import { Router } from "express";
 import { HttpError } from "../errors/httpError.js";
 import { getTrack } from "../services/trackService.js";
 import { getTiming } from "../services/timingService.js";
+import { getRaceFeed } from "../services/raceFeedService.js";
 import { getSessionDetails } from "../services/sessionService.js";
 
 const SESSION_KEY_PATTERN = /^[1-9]\d{0,8}$/;
@@ -53,6 +54,14 @@ router.get("/:sessionKey/timing", async (req, res) => {
 
   res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
   res.json(rows);
+});
+
+// GET /api/sessions/:sessionKey/events
+router.get("/:sessionKey/events", async (req, res) => {
+  const { events, finished } = await getRaceFeed(Number(req.params.sessionKey));
+
+  res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
+  res.json(events);
 });
 
 export default router;

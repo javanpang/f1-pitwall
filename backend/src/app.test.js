@@ -8,6 +8,7 @@ import { getCurrentWeekend } from "./services/weekendService.js";
 import { getSeason } from "./services/seasonService.js";
 import { getTrack } from "./services/trackService.js";
 import { getTiming } from "./services/timingService.js";
+import { getRaceFeed } from "./services/raceFeedService.js";
 
 vi.mock("./services/weekendService.js", () => ({
   getCurrentWeekend: vi.fn(),
@@ -23,6 +24,10 @@ vi.mock("./services/trackService.js", () => ({
 
 vi.mock("./services/timingService.js", () => ({
   getTiming: vi.fn(),
+}));
+
+vi.mock("./services/raceFeedService.js", () => ({
+  getRaceFeed: vi.fn(),
 }));
 
 const app = createApp({ frontendUrl: "https://pitwall.example.com" });
@@ -234,5 +239,36 @@ describe("GET /api/sessions/:sessionKey/timing", () => {
 
     expect(res.status).toBe(404);
     expect(res.body).toEqual({ error: "Session not found." });
+  });
+});
+
+describe("GET /api/sessions/:sessionKey/events", () => {
+  it("returns events, passing the key as a number", async () => {
+    getRaceFeed.mockResolvedValue({
+      events: [{ id: "rc-0", message: "GREEN LIGHT" }],
+      finished: true,
+    });
+
+    const res = await request(app).get("/api/sessions/9158/events");
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([{ id: "rc-0", message: "GREEN LIGHT" }]);
+    expect(getRaceFeed).toHaveBeenCalledWith(9158);
+    expect(res.headers["cache-control"]).toBe("public, max-age=86400");
+  });
+
+  it("does not cache events for a session in progress", async () => {
+    getRaceFeed.mockResolvedValue({ events: [], finished: false });
+
+    const res = await request(app).get("/api/sessions/9158/events");
+
+    expect(res.headers["cache-control"]).toBe("no-store");
+  });
+
+  it("rejects an invalid session key with a 400", async () => {
+    const res = await request(app).get("/api/sessions/abc/events");
+
+    expect(res.status).toBe(400);
+    expect(getRaceFeed).not.toHaveBeenCalled();
   });
 });
