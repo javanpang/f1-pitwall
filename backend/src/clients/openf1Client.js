@@ -144,6 +144,9 @@ export const getStints = (sessionKey) =>
 export const getPits = (sessionKey) =>
   getList("/pit", { session_key: sessionKey });
 
+export const getRaceControl = (sessionKey) =>
+  getList("/race_control", { session_key: sessionKey });
+
 // ==== Location Endpoints ====
 export async function getLocation({ sessionKey, driverNumber, from, to }) {
   return getList("/location", {

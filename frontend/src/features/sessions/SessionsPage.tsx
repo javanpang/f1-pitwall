@@ -6,6 +6,7 @@ import Logo from "../../shared/components/Logo";
 import TrackPanel from "./components/TrackPanel";
 import ReplayControls from "./components/ReplayControls";
 import { ReplayTimingPanel } from "./components/ReplayTimingPanel";
+import { ReplayRaceFeed } from "./components/ReplayRaceFeed";
 import { useReplaySession } from "./hooks/useReplay";
 import { useSession } from "./hooks/useSession";
 import { parseSessionKey, sessionWindow } from "./utils/session";
@@ -44,9 +45,9 @@ export default function SessionsPage() {
           </p>
         ) : (
           <>
-            <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[minmax(0,860px)_minmax(0,1fr)]">
+            <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-2 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1.2fr)_minmax(320px,1fr)]">
               {/* Timing Tower: top left */}
-              <section className="min-h-0 min-w-0">
+              <section className="min-h-0 min-w-0 lg:col-span-2 xl:col-span-1">
                 {replayWindow ? (
                   <ReplayTimingPanel
                     sessionKey={sessionKey}
@@ -68,10 +69,24 @@ export default function SessionsPage() {
                 )}
               </section>
 
-              {/* Track Panel: top right */}
-              <section className="min-h-0 min-w-0">
+              {/* Middle: Track Map */}
+              <section className="flex min-h-0 min-w-0 flex-col">
                 <TrackPanel sessionKey={sessionKey} />
               </section>
+
+              {/* Right: Race Feed */}
+              <section className="flex min-h-0 min-w-0 flex-col overflow-hidden">
+                {replayWindow && (
+                  <ReplayRaceFeed
+                    sessionKey={sessionKey}
+                    startMs={replayWindow.startMs}
+                  />
+                )}
+              </section>
+            </div>
+
+            <div className="grid shrink-0 grid-cols-1 gap-4 empty:hidden lg:grid-cols-2 xl:grid-cols-3">
+              {/* <OtherPanel sessionKey={sessionKey} /> */}
             </div>
 
             {/* Replay Controls: bottom */}
