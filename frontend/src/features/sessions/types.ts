@@ -41,3 +41,22 @@ export interface TimingRow {
   tyre: { compound: TyreCompound; ageLaps: number | null };
   pitStops: number;
 }
+
+export type RaceEventKind =
+  | "flag"
+  | "safety-car"
+  | "steward"
+  | "pit"
+  | "drs"
+  | "session"
+  | "other";
+
+export interface RaceEvent {
+  id: string;
+  date: string;
+  kind: RaceEventKind;
+  flag: string | null;
+  lapNumber: number | null;
+  message: string;
+  driver: { number: number; acronym: string; teamColour: string } | null;
+}
