@@ -4,6 +4,7 @@ export interface TrackGeometry {
   path: string;
   viewBox: string;
   start: TrackPoint;
+  size: number; // Largest dimension of the track, for sizing overlays in SVG units.
 }
 
 // Round to 1 decimal place
@@ -47,5 +48,6 @@ export function buildTrackGeometry(
       width + 2 * pad
     } ${height + 2 * pad}`,
     start: svgPoints[0],
+    size: Math.max(width, height),
   };
 }

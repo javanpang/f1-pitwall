@@ -1,16 +1,17 @@
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import type { TrackPoint } from "../types.ts";
-import { buildTrackGeometry } from "../utils/track.ts";
+import { buildTrackGeometry, type TrackGeometry } from "../utils/track.ts";
 
 interface TrackMapProps {
   points: readonly TrackPoint[];
   label: string;
+  children?: (geometry: TrackGeometry) => ReactNode; // Optional function to render additional SVG elements on top of the track
 }
 
 /**
- * Renders a circuit outline as an SVG.
+ * Renders a circuit outline as an SVG, with optional overlays on top.
  */
-export default function TrackMap({ points, label }: TrackMapProps) {
+export default function TrackMap({ points, label, children }: TrackMapProps) {
   const geometry = useMemo(() => buildTrackGeometry(points), [points]);
 
   if (!geometry) {
@@ -56,6 +57,7 @@ export default function TrackMap({ points, label }: TrackMapProps) {
         vectorEffect="non-scaling-stroke"
         className="stroke-white"
       />
+      {children?.(geometry)}
     </svg>
   );
 }

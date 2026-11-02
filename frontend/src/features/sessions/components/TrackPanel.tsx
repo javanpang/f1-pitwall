@@ -1,8 +1,17 @@
 import type { ReactNode } from "react";
 import { useTrack } from "../hooks/useTrack.ts";
 import TrackMap from "./TrackMap.tsx";
+import CarMarkers from "./CarMarkers.tsx";
 
-export default function TrackPanel({ sessionKey }: { sessionKey: number }) {
+interface TrackPanelProps {
+  sessionKey: number;
+  startMs?: number | null; // Replay start; when set, cars are drawn following playback.
+}
+
+export default function TrackPanel({
+  sessionKey,
+  startMs = null,
+}: TrackPanelProps) {
   const { data, loading, error } = useTrack(sessionKey);
 
   let content: ReactNode;
@@ -25,10 +34,17 @@ export default function TrackPanel({ sessionKey }: { sessionKey: number }) {
     );
   } else {
     content = (
-      <TrackMap
-        points={data.points}
-        label={`Track map of ${data.circuitName}`}
-      />
+      <TrackMap points={data.points} label={`Track map of ${data.circuitName}`}>
+        {startMs !== null
+          ? ({ size }) => (
+              <CarMarkers
+                sessionKey={sessionKey}
+                startMs={startMs}
+                trackSize={size}
+              />
+            )
+          : undefined}
+      </TrackMap>
     );
   }
 
