@@ -4,12 +4,12 @@ import { Pause, Play } from "lucide-react";
 import SegmentedControl from "../../../shared/components/SegmentedControl.tsx";
 
 import {
-  clamp01,
+  clamp,
   ratioFromPointer,
   positionFromKey,
-  formatElapsed,
   SPEED_OPTIONS,
 } from "../utils/replay.ts";
+import { formatElapsed } from "../utils/timingFormat.ts";
 import { useReplayStore } from "../stores/replayStore.ts";
 import { useReplayPosition } from "../hooks/useReplay.ts";
 
@@ -26,7 +26,7 @@ export function Timeline({
   disabled,
   onSeek,
 }: TimelineProps) {
-  const percent = `${(duration > 0 ? clamp01(position / duration) : 0) * 100}%`;
+  const percent = `${(duration > 0 ? clamp(position / duration, 0, 1) : 0) * 100}%`;
 
   const seekFromPointer = (e: PointerEvent<HTMLDivElement>) => {
     const ratio = ratioFromPointer(

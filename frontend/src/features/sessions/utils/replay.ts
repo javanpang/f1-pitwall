@@ -10,21 +10,16 @@ export const SPEED_OPTIONS = [
 
 export type ReplaySpeed = (typeof SPEED_OPTIONS)[number]["value"];
 
-export function formatElapsed(ms: number): string {
-  const total = Math.max(0, Math.floor(ms / 1000));
-  const h = Math.floor(total / 3600);
-  const m = Math.floor((total % 3600) / 60);
-  const s = String(total % 60).padStart(2, "0");
-  return h > 0 ? `${h}:${String(m).padStart(2, "0")}:${s}` : `${m}:${s}`;
-}
-
-export const clamp01 = (n: number) => Math.min(Math.max(n, 0), 1);
+export const clamp = (n: number, min: number, max: number) =>
+  Math.min(Math.max(n, min), max);
 
 export function ratioFromPointer(
   clientX: number,
   rect: DOMRect,
 ): number | null {
-  return rect.width === 0 ? null : clamp01((clientX - rect.left) / rect.width);
+  return rect.width === 0
+    ? null
+    : clamp((clientX - rect.left) / rect.width, 0, 1);
 }
 
 export function positionFromKey(
@@ -34,13 +29,16 @@ export function positionFromKey(
   large: boolean,
 ): number | null {
   const step = large ? KEY_STEP_LARGE_MS : KEY_STEP_MS;
+  let next: number;
   switch (key) {
     case "ArrowRight":
     case "ArrowUp":
-      return position + step;
+      next = position + step;
+      break;
     case "ArrowLeft":
     case "ArrowDown":
-      return position - step;
+      next = position - step;
+      break;
     case "Home":
       return 0;
     case "End":
@@ -48,4 +46,5 @@ export function positionFromKey(
     default:
       return null;
   }
+  return clamp(next, 0, duration);
 }
