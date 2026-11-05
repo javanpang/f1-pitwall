@@ -1,16 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { formatElapsed, positionFromKey, ratioFromPointer } from "./replay.ts";
 
-describe("formatElapsed", () => {
-  it.each([
-    [0, "0:00"],
-    [65_000, "1:05"],
-    [3_725_000, "1:02:05"],
-    [-5000, "0:00"],
-  ])("formats %i ms as %s", (ms, expected) =>
-    expect(formatElapsed(ms)).toBe(expected),
-  );
-});
+import { positionFromKey, ratioFromPointer } from "./replay.ts";
 
 describe("positionFromKey", () => {
   it.each([

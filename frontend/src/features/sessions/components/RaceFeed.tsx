@@ -1,6 +1,6 @@
 import type { RaceEvent } from "../types";
-import { formatElapsed } from "../utils/replay";
 import { EVENT_KIND_LABEL, eventMarkerClass } from "../utils/raceFeed";
+import { formatElapsed } from "../utils/timingFormat";
 
 interface RaceFeedProps {
   events: RaceEvent[];
