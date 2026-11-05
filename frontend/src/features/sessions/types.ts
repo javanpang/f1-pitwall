@@ -60,3 +60,19 @@ export interface RaceEvent {
   message: string;
   driver: { number: number; acronym: string; teamColour: string } | null;
 }
+
+/** `[msSinceChunkStart, x, y]` — may be negative for the lead-in before the chunk. */
+export type CarSample = [number, number, number];
+
+export interface CarTrack {
+  driverNumber: number;
+  acronym: string;
+  teamColour: string;
+  samples: CarSample[];
+}
+
+export interface CarPositionsChunk {
+  from: string;
+  to: string;
+  cars: CarTrack[];
+}

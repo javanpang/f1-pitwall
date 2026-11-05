@@ -1,8 +1,17 @@
 import type { ReactNode } from "react";
 import { useTrack } from "../hooks/useTrack.ts";
 import TrackMap from "./TrackMap.tsx";
+import CarMarkers from "./CarMarkers.tsx";
 
-export default function TrackPanel({ sessionKey }: { sessionKey: number }) {
+interface TrackPanelProps {
+  sessionKey: number;
+  startMs?: number | null; // Replay start; when set, cars are drawn following playback.
+}
+
+export default function TrackPanel({
+  sessionKey,
+  startMs = null,
+}: TrackPanelProps) {
   const { data, loading, error } = useTrack(sessionKey);
 
   let content: ReactNode;
@@ -25,20 +34,25 @@ export default function TrackPanel({ sessionKey }: { sessionKey: number }) {
     );
   } else {
     content = (
-      <TrackMap
-        points={data.points}
-        label={`Track map of ${data.circuitName}`}
-      />
+      <TrackMap points={data.points} label={`Track map of ${data.circuitName}`}>
+        {startMs !== null
+          ? ({ size }) => (
+              <CarMarkers
+                sessionKey={sessionKey}
+                startMs={startMs}
+                trackSize={size}
+              />
+            )
+          : undefined}
+      </TrackMap>
     );
   }
 
   return (
     <section
       aria-label="Track map"
-      className="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-sm border border-accent/20 bg-carbon-200 p-6"
+      className="relative flex aspect-video w-full items-center justify-center overflow-hidden border border-accent/20 bg-carbon-200"
     >
-      <span className="pointer-events-none absolute top-0 left-0 size-2 border-t border-l border-accent" />
-      <span className="pointer-events-none absolute top-0 right-0 size-2 border-t border-r border-accent" />
       {content}
     </section>
   );

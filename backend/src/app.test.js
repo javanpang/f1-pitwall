@@ -9,6 +9,7 @@ import { getSeason } from "./services/seasonService.js";
 import { getTrack } from "./services/trackService.js";
 import { getTiming } from "./services/timingService.js";
 import { getRaceFeed } from "./services/raceFeedService.js";
+import { getCarPositions } from "./services/carPositionsService.js";
 
 vi.mock("./services/weekendService.js", () => ({
   getCurrentWeekend: vi.fn(),
@@ -28,6 +29,10 @@ vi.mock("./services/timingService.js", () => ({
 
 vi.mock("./services/raceFeedService.js", () => ({
   getRaceFeed: vi.fn(),
+}));
+
+vi.mock("./services/carPositionsService.js", () => ({
+  getCarPositions: vi.fn(),
 }));
 
 const app = createApp({ frontendUrl: "https://pitwall.example.com" });
@@ -271,4 +276,33 @@ describe("GET /api/sessions/:sessionKey/events", () => {
     expect(res.status).toBe(400);
     expect(getRaceFeed).not.toHaveBeenCalled();
   });
+});
+
+describe("GET /api/sessions/:sessionKey/positions", () => {
+  it("returns the chunk for a parsed `from`", async () => {
+    const chunk = { from: "2026-03-01T15:00:00.000Z", cars: [] };
+    getCarPositions.mockResolvedValue({ chunk, finished: true });
+
+    const res = await request(app).get(
+      "/api/sessions/9158/positions?from=2026-03-01T15:00:00Z",
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual(chunk);
+    expect(getCarPositions).toHaveBeenCalledWith(
+      9158,
+      Date.UTC(2026, 2, 1, 15),
+    );
+    expect(res.headers["cache-control"]).toBe("public, max-age=86400");
+  });
+
+  it.each(["", "?from=yesterday"])(
+    "rejects a missing or invalid `from` (%s) with a 400",
+    async (query) => {
+      const res = await request(app).get(`/api/sessions/1/positions${query}`);
+
+      expect(res.status).toBe(400);
+      expect(getCarPositions).not.toHaveBeenCalled();
+    },
+  );
 });

@@ -71,7 +71,10 @@ export default function SessionsPage() {
 
               {/* Middle: Track Map */}
               <section className="flex min-h-0 min-w-0 flex-col xl:col-span-15">
-                <TrackPanel sessionKey={sessionKey} />
+                <TrackPanel
+                  sessionKey={sessionKey}
+                  startMs={replayWindow?.startMs}
+                />
               </section>
 
               {/* Right: Race Feed */}

@@ -4,6 +4,7 @@ import { getTrack } from "../services/trackService.js";
 import { getTiming } from "../services/timingService.js";
 import { getRaceFeed } from "../services/raceFeedService.js";
 import { getSessionDetails } from "../services/sessionService.js";
+import { getCarPositions } from "../services/carPositionsService.js";
 
 const SESSION_KEY_PATTERN = /^[1-9]\d{0,8}$/;
 const ISO_TIMESTAMP_PATTERN =
@@ -18,14 +19,17 @@ router.param("sessionKey", (req, res, next, raw) => {
   next();
 });
 
-function parseAt(raw) {
+/**
+ * Parse an ISO timestamp string into milliseconds.
+ */
+function parseTimestamp(raw, name = "at") {
   if (raw === undefined) return null;
   const ms =
     typeof raw === "string" && ISO_TIMESTAMP_PATTERN.test(raw)
       ? Date.parse(raw)
       : NaN;
   if (!Number.isFinite(ms)) {
-    throw new HttpError(400, "`at` must be an ISO 8601 timestamp.");
+    throw new HttpError(400, `\`${name}\` must be an ISO 8601 timestamp.`);
   }
   return ms;
 }
@@ -49,7 +53,7 @@ router.get("/:sessionKey/track", async (req, res) => {
 
 // GET /api/sessions/:sessionKey/timing?at=2026-01-01T12:00:00Z
 router.get("/:sessionKey/timing", async (req, res) => {
-  const at = parseAt(req.query.at);
+  const at = parseTimestamp(req.query.at);
   const { rows, finished } = await getTiming(Number(req.params.sessionKey), at);
 
   res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
@@ -62,6 +66,19 @@ router.get("/:sessionKey/events", async (req, res) => {
 
   res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
   res.json(events);
+});
+
+// GET /api/sessions/:sessionKey/positions?from=2026-01-01T12:00:00Z
+router.get("/:sessionKey/positions", async (req, res) => {
+  const from = parseTimestamp(req.query.from, "from");
+  if (from === null) throw new HttpError(400, "`from` is required.");
+  const { chunk, finished } = await getCarPositions(
+    Number(req.params.sessionKey),
+    from,
+  );
+
+  res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
+  res.json(chunk);
 });
 
 export default router;
