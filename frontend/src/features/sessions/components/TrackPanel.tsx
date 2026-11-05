@@ -51,10 +51,8 @@ export default function TrackPanel({
   return (
     <section
       aria-label="Track map"
-      className="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-sm border border-accent/20 bg-carbon-200 p-6"
+      className="relative flex aspect-video w-full items-center justify-center overflow-hidden border border-accent/20 bg-carbon-200"
     >
-      <span className="pointer-events-none absolute top-0 left-0 size-2 border-t border-l border-accent" />
-      <span className="pointer-events-none absolute top-0 right-0 size-2 border-t border-r border-accent" />
       {content}
     </section>
   );
