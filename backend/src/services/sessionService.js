@@ -1,6 +1,6 @@
 import { getSessions } from "../clients/openf1Client.js";
 import { HttpError } from "../errors/httpError.js";
-import { shapeSession } from "./shapers.js";
+import { shapeSession } from "../transforms/shapers.js";
 
 export async function getSessionDetails(sessionKey) {
   const [session] = await getSessions({ session_key: sessionKey });

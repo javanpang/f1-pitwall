@@ -4,7 +4,7 @@ import cors from "cors";
 import { errorHandler } from "./middleware/errorHandler.js";
 import weekendRoutes from "./routes/weekendRoutes.js";
 import seasonRoutes from "./routes/seasonRoutes.js";
-import sessionsRoutes from "./routes/sessionsRoutes.js";
+import sessionRoutes from "./routes/sessionRoutes.js";
 
 export function createApp({ frontendUrl = "http://localhost:5173" } = {}) {
   const app = express();
@@ -13,7 +13,7 @@ export function createApp({ frontendUrl = "http://localhost:5173" } = {}) {
 
   app.use("/api/weekends", weekendRoutes);
   app.use("/api/seasons", seasonRoutes);
-  app.use("/api/sessions", sessionsRoutes);
+  app.use("/api/sessions", sessionRoutes);
 
   app.get("/health", (req, res) => {
     res.json({

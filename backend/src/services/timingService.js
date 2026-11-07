@@ -13,7 +13,7 @@ import { memoizeAsync } from "../utils/memoizeAsync.js";
 import {
   buildTimingTowerRows,
   indexTimingData,
-} from "./buildTimingTowerRows.js";
+} from "../transforms/buildTimingTowerRows.js";
 
 const FINISHED_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_CACHED_SESSIONS = 30;

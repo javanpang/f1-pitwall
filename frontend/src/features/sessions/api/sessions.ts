@@ -1,19 +1,12 @@
 import { apiClient } from "../../../shared/api/client";
-
-export interface SessionDetails {
-  key: number;
-  name: string;
-  type: string;
-  dateStart: string;
-  dateEnd: string;
-}
+import type { Session } from "../../../shared/types/f1";
 
 export const sessionsApi = {
   async getSession(
     sessionKey: number,
     { signal }: { signal?: AbortSignal } = {},
-  ): Promise<SessionDetails> {
-    const { data } = await apiClient.get<SessionDetails>(
+  ): Promise<Session> {
+    const { data } = await apiClient.get<Session>(
       `api/sessions/${sessionKey}`,
       { signal },
     );
