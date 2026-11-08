@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { season } from "../api/season";
+import { seasonApi } from "../api/season";
 import type { MeetingWithSessions } from "../../../shared/types/f1";
 import { getErrorMessage } from "../../../shared/api/getErrorMessage";
 
@@ -15,7 +15,7 @@ export function useSeason(year: number) {
     error,
   } = useQuery({
     queryKey: ["season", year],
-    queryFn: () => season.getSeason(year),
+    queryFn: () => seasonApi.getSeason(year),
   });
 
   return {

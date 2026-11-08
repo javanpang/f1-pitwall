@@ -1,13 +1,13 @@
-import type { SessionDetails } from "../api/sessions";
+import type { Session } from "../../../shared/types/f1.ts";
 
 export function parseSessionKey(raw: string | undefined): number | null {
   return raw !== undefined && /^[1-9]\d{0,8}$/.test(raw) ? Number(raw) : null;
 }
 
 export function sessionWindow(
-  session: Pick<SessionDetails, "dateStart" | "dateEnd"> | null,
+  session: Pick<Session, "dateStart" | "dateEnd"> | null,
 ): { startMs: number; durationMs: number } | null {
-  if (!session) return null;
+  if (!session || session.dateEnd === null) return null;
   const startMs = Date.parse(session.dateStart);
   const endMs = Date.parse(session.dateEnd);
   if (

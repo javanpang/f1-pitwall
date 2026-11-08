@@ -7,7 +7,7 @@ import {
 
 import { HttpError } from "../errors/httpError.js";
 import { memoizeAsync } from "../utils/memoizeAsync.js";
-import { buildRaceFeed } from "./buildRaceFeed.js";
+import { buildRaceFeed } from "../transforms/buildRaceFeed.js";
 
 const FINISHED_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_CACHED_SESSIONS = 30;

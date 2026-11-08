@@ -4,8 +4,9 @@ import axiosRetry, {
   isNetworkOrIdempotentRequestError,
 } from "axios-retry";
 import PQueue from "p-queue";
+
 import { memoizeAsync } from "../utils/memoizeAsync.js";
-import { toUpstreamError } from "./upstreamError.js";
+import { toUpstreamError } from "../errors/upstreamError.js";
 
 const BASE_URL = "https://api.openf1.org/v1";
 

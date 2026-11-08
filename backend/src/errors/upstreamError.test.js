@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { AxiosError } from "axios";
 import { toUpstreamError } from "./upstreamError.js";
-import { HttpError } from "../errors/httpError.js";
+import { HttpError } from "./httpError.js";
 
 const axiosError = ({ status, code, headers = {} } = {}) =>
   new AxiosError(

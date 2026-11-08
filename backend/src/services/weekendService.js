@@ -1,5 +1,5 @@
 import { getMeetings, getSessions } from "../clients/openf1Client.js";
-import { shapeMeeting, shapeSession } from "./shapers.js";
+import { shapeMeeting, shapeSession } from "../transforms/shapers.js";
 
 // === Date helpers ===
 function toDate(value) {
