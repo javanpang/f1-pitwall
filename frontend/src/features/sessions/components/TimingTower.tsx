@@ -188,7 +188,7 @@ const Row = memo(function Row({ row, index }: RowProps) {
         </span>
       </span>
 
-      <span role="cell" className={`${MONO_CELL}text-body`}>
+      <span role="cell" className={`${MONO_CELL} text-body`}>
         {formatInterval(row.intervalSeconds, row.position === 1) ?? (
           <EmptyValue />
         )}
@@ -261,11 +261,11 @@ export function TimingTower({ rows }: TimingTowerProps) {
   );
 
   return (
-    <section
+    <div
       role="table"
       aria-label="Timing tower"
       aria-rowcount={rows.length + 1}
-      className="@container flex h-full min-h-0 flex-col border border-carbon-300 bg-carbon-200 text-sm"
+      className="@container flex h-full min-h-0 flex-col text-sm"
     >
       <div role="rowgroup" className="shrink-0">
         {HEADER_ROW}
@@ -282,6 +282,6 @@ export function TimingTower({ rows }: TimingTowerProps) {
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

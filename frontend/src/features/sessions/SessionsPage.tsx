@@ -3,22 +3,19 @@ import { Link, useParams } from "react-router-dom";
 
 import Logo from "../../shared/components/Logo";
 
-import TrackPanel from "./components/TrackPanel";
-import ReplayControls from "./components/ReplayControls";
-import { ReplayTimingPanel } from "./components/ReplayTimingPanel";
-import { ReplayRaceFeed } from "./components/ReplayRaceFeed";
-import { useReplaySession } from "./hooks/useReplay";
-import { useSession } from "./hooks/useSession";
-import { parseSessionKey, sessionWindow } from "./utils/session";
+import { TrackMapPanel } from "./components/TrackMapPanel.tsx";
+import ReplayControls from "./components/ReplayControls.tsx";
+import { TimingTowerPanel } from "./components/TimingTowerPanel.tsx";
+import { RaceFeedPanel } from "./components/RaceFeedPanel.tsx";
+import { useReplaySession } from "./hooks/useReplay.ts";
+import { useSession } from "./hooks/useSession.ts";
+import { parseSessionKey, sessionWindow } from "./utils/session.ts";
+import { DataPanel } from "../../shared/components/DataPanel.tsx";
 
 export default function SessionsPage() {
   const sessionKey = parseSessionKey(useParams().sessionKey);
-  const {
-    data: session,
-    loading: sessionLoading,
-    error: sessionError,
-  } = useSession(sessionKey);
-  const replayWindow = sessionWindow(session);
+  const sessionState = useSession(sessionKey);
+  const replayWindow = sessionWindow(sessionState.data);
 
   useReplaySession(sessionKey, replayWindow?.durationMs ?? 0);
 
@@ -44,57 +41,53 @@ export default function SessionsPage() {
             Invalid session
           </p>
         ) : (
-          <>
-            <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-2 xl:grid-cols-38">
-              {/* Timing Tower: top left */}
-              <section className="min-h-0 min-w-0 lg:col-span-2 xl:col-span-15">
-                {replayWindow ? (
-                  <ReplayTimingPanel
-                    sessionKey={sessionKey}
-                    startMs={replayWindow.startMs}
-                  />
-                ) : sessionLoading ? (
-                  <div
-                    role="status"
-                    aria-label="Loading session"
-                    className="h-96 animate-pulse border border-carbon-300 bg-carbon-200"
-                  />
-                ) : (
-                  <div
-                    role="alert"
-                    className="border border-live/40 bg-carbon-200 p-4 font-mono text-sm text-live"
-                  >
-                    {sessionError ?? "Replay is unavailable for this session."}
+          <DataPanel
+            label="Session"
+            state={sessionState}
+            isEmpty={(session) => sessionWindow(session) === null}
+            emptyMessage="Replay is unavailable for this session."
+            className="flex-1 border-0 bg-transparent"
+          >
+            {(session) => {
+              const { startMs } = sessionWindow(session)!;
+              return (
+                <>
+                  <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-2 xl:grid-cols-38">
+                    {/* Timing Tower: top left */}
+                    <section className="min-h-0 min-w-0 lg:col-span-2 xl:col-span-15">
+                      <TimingTowerPanel
+                        sessionKey={sessionKey}
+                        startMs={startMs}
+                      />
+                    </section>
+
+                    {/* Middle: Track Map */}
+                    <section className="flex min-h-0 min-w-0 flex-col xl:col-span-15">
+                      <TrackMapPanel
+                        sessionKey={sessionKey}
+                        startMs={startMs}
+                      />
+                    </section>
+
+                    {/* Right: Race Feed */}
+                    <section className="flex min-h-0 min-w-0 flex-col overflow-hidden xl:col-span-8">
+                      <RaceFeedPanel
+                        sessionKey={sessionKey}
+                        startMs={startMs}
+                      />
+                    </section>
                   </div>
-                )}
-              </section>
 
-              {/* Middle: Track Map */}
-              <section className="flex min-h-0 min-w-0 flex-col xl:col-span-15">
-                <TrackPanel
-                  sessionKey={sessionKey}
-                  startMs={replayWindow?.startMs}
-                />
-              </section>
+                  <div className="grid shrink-0 grid-cols-1 gap-4 empty:hidden lg:grid-cols-2 xl:grid-cols-3">
+                    {/* <OtherPanel sessionKey={sessionKey} /> */}
+                  </div>
 
-              {/* Right: Race Feed */}
-              <section className="flex min-h-0 min-w-0 flex-col overflow-hidden xl:col-span-8">
-                {replayWindow && (
-                  <ReplayRaceFeed
-                    sessionKey={sessionKey}
-                    startMs={replayWindow.startMs}
-                  />
-                )}
-              </section>
-            </div>
-
-            <div className="grid shrink-0 grid-cols-1 gap-4 empty:hidden lg:grid-cols-2 xl:grid-cols-3">
-              {/* <OtherPanel sessionKey={sessionKey} /> */}
-            </div>
-
-            {/* Replay Controls: bottom */}
-            <ReplayControls />
-          </>
+                  {/* Replay Controls: bottom */}
+                  <ReplayControls />
+                </>
+              );
+            }}
+          </DataPanel>
         )}
       </main>
     </div>
