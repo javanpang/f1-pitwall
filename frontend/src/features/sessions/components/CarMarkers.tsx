@@ -11,7 +11,7 @@ interface CarMarkersProps {
 /**
  * Draws each car on the track map at its interpolated position for the current replay time.
  */
-export default function CarMarkers({
+export function CarMarkers({
   sessionKey,
   startMs,
   trackSize,

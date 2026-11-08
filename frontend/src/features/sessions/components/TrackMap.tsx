@@ -11,7 +11,7 @@ interface TrackMapProps {
 /**
  * Renders a circuit outline as an SVG, with optional overlays on top.
  */
-export default function TrackMap({ points, label, children }: TrackMapProps) {
+export function TrackMap({ points, label, children }: TrackMapProps) {
   const geometry = useMemo(() => buildTrackGeometry(points), [points]);
 
   if (!geometry) {
