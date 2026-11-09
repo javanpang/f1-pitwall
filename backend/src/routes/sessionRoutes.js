@@ -1,10 +1,12 @@
 import { Router } from "express";
-import { HttpError } from "../errors/httpError.js";
+
 import { getTrack } from "../services/trackService.js";
-import { getTiming } from "../services/timingService.js";
+import { getLapGaps, getTiming } from "../services/timingService.js";
 import { getRaceFeed } from "../services/raceFeedService.js";
 import { getSessionDetails } from "../services/sessionService.js";
 import { getCarPositions } from "../services/carPositionsService.js";
+
+import { HttpError } from "../errors/httpError.js";
 
 const SESSION_KEY_PATTERN = /^[1-9]\d{0,8}$/;
 const ISO_TIMESTAMP_PATTERN =
@@ -19,9 +21,7 @@ router.param("sessionKey", (req, res, next, raw) => {
   next();
 });
 
-/**
- * Parse an ISO timestamp string into milliseconds.
- */
+/** Parse an ISO timestamp string into milliseconds. */
 function parseTimestamp(raw, name = "at") {
   if (raw === undefined) return null;
   const ms =
@@ -58,6 +58,14 @@ router.get("/:sessionKey/timing", async (req, res) => {
 
   res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
   res.json(rows);
+});
+
+// GET /api/sessions/:sessionKey/lap-gaps
+router.get("/:sessionKey/lap-gaps", async (req, res) => {
+  const { lapGaps, finished } = await getLapGaps(Number(req.params.sessionKey));
+
+  res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
+  res.json(lapGaps);
 });
 
 // GET /api/sessions/:sessionKey/events
