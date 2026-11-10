@@ -3,14 +3,16 @@ import { Link, useParams } from "react-router-dom";
 
 import Logo from "../../shared/components/Logo";
 
+import { DataPanel } from "../../shared/components/DataPanel.tsx";
 import { TrackMapPanel } from "./components/TrackMapPanel.tsx";
 import ReplayControls from "./components/ReplayControls.tsx";
 import { TimingTowerPanel } from "./components/TimingTowerPanel.tsx";
 import { RaceFeedPanel } from "./components/RaceFeedPanel.tsx";
+import { GapChartPanel } from "./components/GapChartPanel.tsx";
+
 import { useReplaySession } from "./hooks/useReplay.ts";
 import { useSession } from "./hooks/useSession.ts";
 import { parseSessionKey, sessionWindow } from "./utils/session.ts";
-import { DataPanel } from "../../shared/components/DataPanel.tsx";
 
 export default function SessionsPage() {
   const sessionKey = parseSessionKey(useParams().sessionKey);
@@ -50,11 +52,16 @@ export default function SessionsPage() {
           >
             {(session) => {
               const { startMs } = sessionWindow(session)!;
+
+              const cell = "flex min-h-0 min-w-0 flex-col overflow-hidden";
+
               return (
                 <>
-                  <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-2 xl:grid-cols-38">
+                  <div className="grid min-h-0 flex-1 grid-cols-1 lg:grid-rows-2 xl:grid-cols-38 xl:grid-rows-2">
                     {/* Timing Tower: top left */}
-                    <section className="min-h-0 min-w-0 lg:col-span-2 xl:col-span-15">
+                    <section
+                      className={`${cell} lg:col-span-2 xl:col-span-15 xl:row-start-1`}
+                    >
                       <TimingTowerPanel
                         sessionKey={sessionKey}
                         startMs={startMs}
@@ -62,7 +69,9 @@ export default function SessionsPage() {
                     </section>
 
                     {/* Middle: Track Map */}
-                    <section className="flex min-h-0 min-w-0 flex-col xl:col-span-15">
+                    <section
+                      className={`${cell} aspect-square xl:aspect-auto xl:col-span-15 xl:row-start-1`}
+                    >
                       <TrackMapPanel
                         sessionKey={sessionKey}
                         startMs={startMs}
@@ -70,16 +79,23 @@ export default function SessionsPage() {
                     </section>
 
                     {/* Right: Race Feed */}
-                    <section className="flex min-h-0 min-w-0 flex-col overflow-hidden xl:col-span-8">
+                    <section
+                      className={`${cell} lg:h-0 lg:min-h-full xl:h-auto xl:min-h-0 xl:col-span-8 xl:col-start-31 xl:row-span-2 xl:row-start-1`}
+                    >
                       <RaceFeedPanel
                         sessionKey={sessionKey}
                         startMs={startMs}
                       />
                     </section>
-                  </div>
 
-                  <div className="grid shrink-0 grid-cols-1 gap-4 empty:hidden lg:grid-cols-2 xl:grid-cols-3">
-                    {/* <OtherPanel sessionKey={sessionKey} /> */}
+                    <section
+                      className={`${cell} xl:col-span-30 xl:col-start-1 xl:row-start-2`}
+                    >
+                      <GapChartPanel
+                        sessionKey={sessionKey}
+                        startMs={startMs}
+                      />
+                    </section>
                   </div>
 
                   {/* Replay Controls: bottom */}

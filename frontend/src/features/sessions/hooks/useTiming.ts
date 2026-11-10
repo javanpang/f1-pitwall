@@ -23,6 +23,7 @@ export function useTiming(
 
   return {
     data: query.data ?? null,
+    isPlaceholder: query.isPlaceholderData,
     loading: query.isPending,
     error: query.error ? getErrorMessage(query.error) : null,
   };
