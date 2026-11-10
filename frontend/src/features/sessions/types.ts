@@ -76,3 +76,16 @@ export interface CarPositionsChunk {
   to: string;
   cars: CarTrack[];
 }
+
+/** Gap to leader at the end of one lap. */
+export interface LapGap {
+  lap: number;
+  at: string; // time leader crossed the line.
+  leader: number;
+  gaps: Record<string, number>;
+}
+
+export interface LapGaps {
+  totalLaps: number;
+  laps: LapGap[];
+}

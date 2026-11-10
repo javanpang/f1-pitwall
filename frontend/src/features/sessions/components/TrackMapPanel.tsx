@@ -19,7 +19,7 @@ export function TrackMapPanel({
     <DataPanel
       label="Track Map"
       state={state}
-      className="relative w-full items-center overflow-hidden"
+      className="relative h-full w-full flex-1 overflow-hidden"
     >
       {(track) => (
         <TrackMap

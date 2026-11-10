@@ -14,6 +14,7 @@ import {
   buildTimingTowerRows,
   indexTimingData,
 } from "../transforms/buildTimingTowerRows.js";
+import { buildLapGaps } from "../transforms/buildLapGaps.js";
 
 const FINISHED_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_CACHED_SESSIONS = 30;
@@ -37,7 +38,7 @@ const getFinishedIndex = memoizeAsync(loadTimingIndex, {
   maxEntries: MAX_CACHED_SESSIONS,
 });
 
-export async function getTiming(sessionKey, at = null) {
+async function getTimingIndex(sessionKey) {
   const [session] = await getSessions({ session_key: sessionKey });
   if (!session) throw new HttpError(404, "Session not found");
 
@@ -46,5 +47,15 @@ export async function getTiming(sessionKey, at = null) {
     ? await getFinishedIndex(sessionKey)
     : await loadTimingIndex(sessionKey);
 
+  return { finished, index };
+}
+
+export async function getTiming(sessionKey, at = null) {
+  const { finished, index } = await getTimingIndex(sessionKey);
   return { finished, rows: buildTimingTowerRows(index, at) };
+}
+
+export async function getLapGaps(sessionKey) {
+  const { finished, index } = await getTimingIndex(sessionKey);
+  return { finished, lapGaps: buildLapGaps(index) };
 }
