@@ -1,18 +1,6 @@
-const COMPOUNDS = new Set(["SOFT", "MEDIUM", "HARD", "INTERMEDIATE", "WET"]);
+import { isNumber, toCompound, toMs, toTeamColour } from "./shapers.js";
+
 const SECTORS = [1, 2, 3];
-const FALLBACK_TEAM_COLOUR = "#9CA3AF";
-
-const toCompound = (value) => {
-  const upper = String(value ?? "").toUpperCase();
-  return COMPOUNDS.has(upper) ? upper : "UNKNOWN";
-};
-
-const isNumber = (v) => typeof v === "number" && Number.isFinite(v);
-
-const toMs = (iso) => {
-  const ms = Date.parse(iso);
-  return Number.isFinite(ms) ? ms : null;
-};
 
 const minOf = (values) => {
   let min = null;
@@ -82,7 +70,11 @@ export function indexTimingData({
       stints: [...(stintsBy.get(n) ?? [])].sort(
         (a, b) => a.stint_number - b.stint_number,
       ),
-      pits: toSeries(pitsBy.get(n), () => null),
+      pits: toSeries(pitsBy.get(n), (r) => ({
+        lapNumber: r.lap_number,
+        stopSeconds: isNumber(r.stop_duration) ? r.stop_duration : null,
+        laneSeconds: [r.lane_duration, r.pit_duration].find(isNumber) ?? null,
+      })),
     };
   });
 }
@@ -178,9 +170,7 @@ export function buildTimingTowerRows(index, at = null) {
       driverNumber: driver.driver_number,
       nameAcronym: driver.name_acronym,
       teamName: driver.team_name,
-      teamColour: driver.team_colour
-        ? `#${driver.team_colour}`
-        : FALLBACK_TEAM_COLOUR,
+      teamColour: toTeamColour(driver.team_colour),
       positionChange,
       intervalSeconds,
       sectors,

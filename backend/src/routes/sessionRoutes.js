@@ -1,7 +1,7 @@
 import { Router } from "express";
 
 import { getTrack } from "../services/trackService.js";
-import { getLapGaps, getTiming } from "../services/timingService.js";
+import { getLapGaps, getPitStops, getTiming } from "../services/timingService.js";
 import { getRaceFeed } from "../services/raceFeedService.js";
 import { getSessionDetails } from "../services/sessionService.js";
 import { getCarPositions } from "../services/carPositionsService.js";
@@ -66,6 +66,16 @@ router.get("/:sessionKey/lap-gaps", async (req, res) => {
 
   res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
   res.json(lapGaps);
+});
+
+// GET /api/sessions/:sessionKey/pit-stops
+router.get("/:sessionKey/pit-stops", async (req, res) => {
+  const { pitStops, finished } = await getPitStops(
+    Number(req.params.sessionKey),
+  );
+
+  res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
+  res.json(pitStops);
 });
 
 // GET /api/sessions/:sessionKey/events

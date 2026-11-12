@@ -1,17 +1,10 @@
-const FALLBACK_TEAM_COLOUR = "#9CA3AF";
+import { isNumber, toMs, toTeamColour } from "./shapers.js";
 
 const CATEGORY_KIND = {
   Flag: "flag",
   SafetyCar: "safety-car",
   Drs: "drs",
   SessionStatus: "session",
-};
-
-const isNumber = (v) => typeof v === "number" && Number.isFinite(v);
-
-const toMs = (iso) => {
-  const ms = Date.parse(iso);
-  return Number.isFinite(ms) ? ms : null;
 };
 
 export function classifyRaceControl(record) {
@@ -34,7 +27,7 @@ function indexDrivers(drivers) {
     map.set(d.driver_number, {
       number: d.driver_number,
       acronym: d.name_acronym ?? String(d.driver_number),
-      teamColour: d.team_colour ? `#${d.team_colour}` : FALLBACK_TEAM_COLOUR,
+      teamColour: toTeamColour(d.team_colour),
     });
   }
   return map;

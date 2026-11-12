@@ -7,7 +7,7 @@ import { HttpError } from "./errors/httpError.js";
 import { getCurrentWeekend } from "./services/weekendService.js";
 import { getSeason } from "./services/seasonService.js";
 import { getTrack } from "./services/trackService.js";
-import { getTiming } from "./services/timingService.js";
+import { getPitStops, getTiming } from "./services/timingService.js";
 import { getRaceFeed } from "./services/raceFeedService.js";
 import { getCarPositions } from "./services/carPositionsService.js";
 
@@ -25,6 +25,7 @@ vi.mock("./services/trackService.js", () => ({
 
 vi.mock("./services/timingService.js", () => ({
   getTiming: vi.fn(),
+  getPitStops: vi.fn(),
 }));
 
 vi.mock("./services/raceFeedService.js", () => ({
@@ -244,6 +245,30 @@ describe("GET /api/sessions/:sessionKey/timing", () => {
 
     expect(res.status).toBe(404);
     expect(res.body).toEqual({ error: "Session not found." });
+  });
+});
+
+describe("GET /api/sessions/:sessionKey/pit-stops", () => {
+  it("returns pit stops and caches finished sessions", async () => {
+    getPitStops.mockResolvedValue({
+      pitStops: [{ id: "1-0", lapNumber: 12 }],
+      finished: true,
+    });
+
+    const res = await request(app).get("/api/sessions/9158/pit-stops");
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual([{ id: "1-0", lapNumber: 12 }]);
+    expect(res.headers["cache-control"]).toBe("public, max-age=86400");
+    expect(getPitStops).toHaveBeenCalledWith(9158);
+  });
+
+  it("does not cache a live session", async () => {
+    getPitStops.mockResolvedValue({ pitStops: [], finished: false });
+
+    const res = await request(app).get("/api/sessions/1/pit-stops");
+
+    expect(res.headers["cache-control"]).toBe("no-store");
   });
 });
 

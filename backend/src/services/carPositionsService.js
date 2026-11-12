@@ -6,6 +6,7 @@ import {
 
 import { HttpError } from "../errors/httpError.js";
 import { memoizeAsync } from "../utils/memoizeAsync.js";
+import { toTeamColour } from "../transforms/shapers.js";
 
 export const CHUNK_MS = 60_000;
 // Extra time fetched before a chunk so cars can be interpolated from the previous sample.
@@ -14,8 +15,6 @@ const LEAD_IN_MS = 3_000;
 const FINISHED_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_CACHED_SESSIONS = 30;
 const MAX_CACHED_CHUNKS = 300;
-
-const FALLBACK_TEAM_COLOUR = "#9CA3AF";
 
 const isOnTrack = (s) =>
   Number.isFinite(s.x) && Number.isFinite(s.y) && !(s.x === 0 && s.y === 0);
@@ -45,7 +44,7 @@ export function buildCarTracks(samples, drivers, fromMs) {
       return {
         driverNumber,
         acronym: d?.name_acronym ?? String(driverNumber),
-        teamColour: d?.team_colour ? `#${d.team_colour}` : FALLBACK_TEAM_COLOUR,
+        teamColour: toTeamColour(d?.team_colour),
         samples: list.sort((a, b) => a[0] - b[0]),
       };
     });
