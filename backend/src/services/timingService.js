@@ -15,6 +15,7 @@ import {
   indexTimingData,
 } from "../transforms/buildTimingTowerRows.js";
 import { buildLapGaps } from "../transforms/buildLapGaps.js";
+import { buildPitStops } from "../transforms/buildPitStops.js";
 
 const FINISHED_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_CACHED_SESSIONS = 30;
@@ -58,4 +59,9 @@ export async function getTiming(sessionKey, at = null) {
 export async function getLapGaps(sessionKey) {
   const { finished, index } = await getTimingIndex(sessionKey);
   return { finished, lapGaps: buildLapGaps(index) };
+}
+
+export async function getPitStops(sessionKey) {
+  const { finished, index } = await getTimingIndex(sessionKey);
+  return { finished, pitStops: buildPitStops(index) };
 }

@@ -9,6 +9,7 @@ import ReplayControls from "./components/ReplayControls.tsx";
 import { TimingTowerPanel } from "./components/TimingTowerPanel.tsx";
 import { RaceFeedPanel } from "./components/RaceFeedPanel.tsx";
 import { GapChartPanel } from "./components/GapChartPanel.tsx";
+import { PitStopPanel } from "./components/PitStopPanel.tsx";
 
 import { useReplaySession } from "./hooks/useReplay.ts";
 import { useSession } from "./hooks/useSession.ts";
@@ -88,13 +89,21 @@ export default function SessionsPage() {
                       />
                     </section>
 
+                    {/* Bottom Left: Gap Chart, under Timing Tower */}
                     <section
-                      className={`${cell} xl:col-span-30 xl:col-start-1 xl:row-start-2`}
+                      className={`${cell} xl:col-span-22 xl:col-start-1 xl:row-start-2`}
                     >
                       <GapChartPanel
                         sessionKey={sessionKey}
                         startMs={startMs}
                       />
+                    </section>
+
+                    {/* Bottom Middle: Pit Stops, under Track Map, left of Race Feed */}
+                    <section
+                      className={`${cell} xl:col-span-8 xl:col-start-23 xl:row-start-2`}
+                    >
+                      <PitStopPanel sessionKey={sessionKey} startMs={startMs} />
                     </section>
                   </div>
 

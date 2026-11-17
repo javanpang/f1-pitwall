@@ -23,3 +23,25 @@ export function shapeMeeting(m) {
     year: m.year,
   };
 }
+
+// ------ Shared value helpers ------
+
+const COMPOUNDS = new Set(["SOFT", "MEDIUM", "HARD", "INTERMEDIATE", "WET"]);
+const FALLBACK_TEAM_COLOUR = "#9CA3AF";
+
+export const isNumber = (v) => typeof v === "number" && Number.isFinite(v);
+
+/** ISO timestamp to milliseconds, or null if it doesn't parse. */
+export const toMs = (iso) => {
+  const ms = Date.parse(iso);
+  return Number.isFinite(ms) ? ms : null;
+};
+
+/** OpenF1 tyre compound, normalised to a known compound or "UNKNOWN". */
+export const toCompound = (value) => {
+  const upper = String(value ?? "").toUpperCase();
+  return COMPOUNDS.has(upper) ? upper : "UNKNOWN";
+};
+
+/** OpenF1 `team_colour` to a CSS colour, with a grey fallback. */
+export const toTeamColour = (raw) => (raw ? `#${raw}` : FALLBACK_TEAM_COLOUR);
