@@ -4,12 +4,12 @@ import { ArrowDown, ArrowUp, Minus, type LucideIcon } from "lucide-react";
 import type { PositionChange, TimingRow } from "../types";
 import {
   TIME_STATUS_CLASS,
-  TYRE_CONFIG,
   formatInterval,
   formatLapTime,
   formatSector,
   shortTeamName,
 } from "../utils/timingFormat";
+import { TyreBadge } from "./TyreBadge.tsx";
 
 // ------ Layout ------
 const ROW_HEIGHT_PX = 30;
@@ -89,39 +89,6 @@ function ChangeIcon({ change }: { change: PositionChange }) {
   const { Icon, label, className } = CHANGE_ICON[change] ?? NO_CHANGE;
   return (
     <Icon role="img" aria-label={label} className={`size-3 ${className}`} />
-  );
-}
-
-interface TyreBadgeProps {
-  tyre: TimingRow["tyre"];
-  size?: number;
-}
-
-function TyreBadge({ tyre, size = 16 }: TyreBadgeProps) {
-  const { colour, letter } = TYRE_CONFIG[tyre.compound] ?? TYRE_CONFIG.UNKNOWN;
-  const hasAge = tyre.ageLaps != null;
-  const title = `${tyre.compound.toLowerCase()}${hasAge ? `, ${tyre.ageLaps} laps old` : ""}`;
-
-  return (
-    <span className="inline-flex items-center gap-1" title={title}>
-      <span
-        className="inline-flex shrink-0 items-center justify-center rounded-full border-2 bg-zinc-950 font-bold leading-none"
-        style={{
-          borderColor: colour,
-          color: colour,
-          width: size,
-          height: size,
-          fontSize: size * 0.5,
-        }}
-      >
-        {letter}
-      </span>
-      {hasAge && (
-        <span className="font-mono text-[10px] tabular-nums text-muted">
-          {tyre.ageLaps}
-        </span>
-      )}
-    </span>
   );
 }
 
