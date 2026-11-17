@@ -61,7 +61,7 @@ export interface RaceEvent {
   driver: { number: number; acronym: string; teamColour: string } | null;
 }
 
-/** `[msSinceChunkStart, x, y]` — may be negative for the lead-in before the chunk. */
+/** `[msSinceChunkStart, x, y]` - may be negative for the lead-in before the chunk. */
 export type CarSample = [number, number, number];
 
 export interface CarTrack {
@@ -88,4 +88,23 @@ export interface LapGap {
 export interface LapGaps {
   totalLaps: number;
   laps: LapGap[];
+}
+
+export interface PitStopTyre {
+  compound: TyreCompound;
+  ageLaps: number | null; // Tyre age when fitted; 0 means a new set.
+}
+
+export interface PitStop {
+  id: string;
+  date: string;
+  lapNumber: number | null;
+  driver: { number: number; acronym: string; teamColour: string };
+  tyreFrom: PitStopTyre | null;
+  tyreTo: PitStopTyre | null;
+  stopSeconds: number | null; // Stationary time.
+  laneSeconds: number | null; // Pit lane time.
+  positionBefore: number | null;
+  positionAfter: number | null; // Position at the end of the out-lap.
+  settledAt: string | null; // When `positionAfter` is known.
 }
