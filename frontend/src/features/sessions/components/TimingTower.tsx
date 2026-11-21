@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo, useRef, type ReactNode } from "react";
 import { ArrowDown, ArrowUp, Minus, type LucideIcon } from "lucide-react";
 
-import type { PositionChange, TimingRow } from "../types";
+import type { PositionChange, TimedValue, TimingRow } from "../types";
 import {
   TIME_STATUS_CLASS,
   formatInterval,
@@ -91,8 +91,6 @@ function ChangeIcon({ change }: { change: PositionChange }) {
     <Icon role="img" aria-label={label} className={`size-3 ${className}`} />
   );
 }
-
-type TimedValue = TimingRow["lastLap"];
 
 interface TimeCellProps {
   time: TimedValue;

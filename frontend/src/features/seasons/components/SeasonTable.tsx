@@ -1,7 +1,11 @@
 import { Link } from "react-router-dom";
 import type { Session } from "../../../shared/types/f1.ts";
-import type { SessionStatus } from "../types.ts";
-import type { FeaturedRound, Round, SessionColumn } from "../types.ts";
+import type {
+  FeaturedRound,
+  Round,
+  SessionColumn,
+  SessionStatus,
+} from "../types.ts";
 import { getSessionStatus } from "../utils/season.ts";
 import { formatDateRange, formatWhen } from "../../../shared/utils/date.ts";
 

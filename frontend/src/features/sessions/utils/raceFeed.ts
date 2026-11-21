@@ -1,4 +1,4 @@
-import type { RaceEvent } from "../types";
+import type { RaceEvent, RaceEventKind } from "../types";
 
 /** Events that have happened by `atMs`, newest first. Expects `events` sorted oldest first. */
 export function eventsUpTo(events: RaceEvent[], atMs: number): RaceEvent[] {
@@ -40,7 +40,7 @@ export function eventMarkerClass(event: RaceEvent): string {
   }
 }
 
-export const EVENT_KIND_LABEL: Record<RaceEvent["kind"], string> = {
+export const EVENT_KIND_LABEL: Record<RaceEventKind, string> = {
   flag: "Flag",
   "safety-car": "Safety car",
   steward: "Stewards",

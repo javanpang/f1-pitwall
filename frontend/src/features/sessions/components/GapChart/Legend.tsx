@@ -1,7 +1,7 @@
 import { formatGap, type Sample, type Series } from "./samples.ts";
 
 /** A visual representation of a driver's color and dash pattern. */
-export function Swatch({ colour, dash }: { colour: string; dash?: string }) {
+export function Swatch({ colour, dash }: Pick<Series, "colour" | "dash">) {
   return (
     <svg width={14} height={6} aria-hidden="true" className="shrink-0">
       <line

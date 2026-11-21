@@ -1,3 +1,4 @@
+import type { SegmentedControlOption } from "../../../shared/components/SegmentedControl.tsx";
 import type { MeetingWithSessions, Session } from "../../../shared/types/f1.ts";
 import type {
   SessionTypeFilter,
@@ -15,7 +16,7 @@ export const YEAR_OPTIONS = Array.from(
   (_, i) => ({ value: CURRENT_YEAR - i, label: String(CURRENT_YEAR - i) }),
 );
 
-export const TYPE_OPTIONS: { value: SessionTypeFilter; label: string }[] = [
+export const TYPE_OPTIONS: readonly SegmentedControlOption<SessionTypeFilter>[] = [
   { value: "all", label: "All" },
   { value: "Practice", label: "Practice" },
   { value: "Qualifying", label: "Qualifying" },

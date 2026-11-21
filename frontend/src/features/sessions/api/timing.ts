@@ -1,9 +1,8 @@
-import { apiClient } from "../../../shared/api/client";
+import { apiClient, type RequestOptions } from "../../../shared/api/client";
 import type { TimingRow } from "../types";
 
-interface GetTimingOptions {
+interface GetTimingOptions extends RequestOptions {
   at?: string | null;
-  signal?: AbortSignal;
 }
 
 export const timingApi = {

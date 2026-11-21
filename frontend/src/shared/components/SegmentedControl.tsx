@@ -1,11 +1,11 @@
-interface Option<T> {
+export interface SegmentedControlOption<T> {
   value: T;
   label: string;
 }
 
-interface Props<T> {
+interface SegmentedControlProps<T> {
   label: string;
-  options: readonly Option<T>[];
+  options: readonly SegmentedControlOption<T>[];
   value: T;
   onChange: (value: T) => void;
 }
@@ -18,7 +18,7 @@ export default function SegmentedControl<T extends string | number>({
   options,
   value,
   onChange,
-}: Props<T>) {
+}: SegmentedControlProps<T>) {
   return (
     <div
       role="group"

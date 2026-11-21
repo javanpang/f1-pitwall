@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { useCurrentWeekend } from "./useCurrentWeekend.ts";
 import { weekendApi } from "../api/weekend.ts";
-import type { WeekendData } from "../../../shared/types/f1.ts";
+import type { WeekendData } from "../types.ts";
 
 vi.mock("../api/weekend", () => ({
   weekendApi: { getCurrent: vi.fn() },
