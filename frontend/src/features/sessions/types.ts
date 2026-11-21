@@ -22,7 +22,21 @@ export type TimeStatus = "overall-best" | "personal-best" | "default";
 
 export type PositionChange = "up" | "down" | "none";
 
-export interface SectorTime {
+/** A tyre set: compound plus age in laps (null when unknown). */
+export interface TyreSet {
+  compound: TyreCompound;
+  ageLaps: number | null; // the age when fitted. 0 means a new set.
+}
+
+/** Driver details attached to race events and pit stops. */
+export interface DriverRef {
+  number: number;
+  acronym: string;
+  teamColour: string;
+}
+
+/** A lap or sector time with its colour-coded status. */
+export interface TimedValue {
   seconds: number | null;
   status: TimeStatus;
 }
@@ -35,10 +49,10 @@ export interface TimingRow {
   teamColour: string;
   positionChange: PositionChange;
   intervalSeconds: number | null;
-  sectors: [SectorTime, SectorTime, SectorTime];
-  lastLap: { seconds: number | null; status: TimeStatus };
-  bestLap: { seconds: number | null; status: TimeStatus };
-  tyre: { compound: TyreCompound; ageLaps: number | null };
+  sectors: [TimedValue, TimedValue, TimedValue];
+  lastLap: TimedValue;
+  bestLap: TimedValue;
+  tyre: TyreSet;
   pitStops: number;
 }
 
@@ -58,7 +72,7 @@ export interface RaceEvent {
   flag: string | null;
   lapNumber: number | null;
   message: string;
-  driver: { number: number; acronym: string; teamColour: string } | null;
+  driver: DriverRef | null;
 }
 
 /** `[msSinceChunkStart, x, y]` - may be negative for the lead-in before the chunk. */
@@ -90,18 +104,13 @@ export interface LapGaps {
   laps: LapGap[];
 }
 
-export interface PitStopTyre {
-  compound: TyreCompound;
-  ageLaps: number | null; // Tyre age when fitted; 0 means a new set.
-}
-
 export interface PitStop {
   id: string;
   date: string;
   lapNumber: number | null;
-  driver: { number: number; acronym: string; teamColour: string };
-  tyreFrom: PitStopTyre | null;
-  tyreTo: PitStopTyre | null;
+  driver: DriverRef;
+  tyreFrom: TyreSet | null;
+  tyreTo: TyreSet | null;
   stopSeconds: number | null; // Stationary time.
   laneSeconds: number | null; // Pit lane time.
   positionBefore: number | null;

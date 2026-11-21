@@ -13,6 +13,7 @@ export interface SessionColumn {
 export interface Round extends MeetingWithSessions {
   round: number;
 }
+
 export interface FeaturedRound {
   key: number;
   kind: "live" | "next";

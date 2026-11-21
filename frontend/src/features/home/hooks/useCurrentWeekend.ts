@@ -1,15 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import type { WeekendData } from "../../../shared/types/f1.ts";
 import { getErrorMessage } from "../../../shared/api/getErrorMessage.ts";
 import { weekendApi } from "../api/weekend.ts";
 
-interface UseCurrentWeekendResult {
-  data: WeekendData | null;
-  loading: boolean;
-  error: string | null;
-}
-
-export function useCurrentWeekend(): UseCurrentWeekendResult {
+export function useCurrentWeekend() {
   const {
     data = null,
     isPending,

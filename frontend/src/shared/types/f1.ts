@@ -1,9 +1,4 @@
-export type WeekendStatus =
-  | "upcoming"
-  | "session_live"
-  | "between_sessions"
-  | "weekend_over"
-  | "season_over";
+export type SessionType = "Practice" | "Qualifying" | "Race";
 
 export interface Session {
   key: number;
@@ -25,22 +20,7 @@ export interface Meeting {
   year: number;
 }
 
-export interface WeekendData {
-  status: WeekendStatus;
-  meeting: Meeting;
-  sessions: Session[];
-  activeSession: Session | null;
-  nextSession: Session | null;
-  lastSession: Session | null;
-}
-
 export interface MeetingWithSessions {
   meeting: Meeting;
   sessions: Session[];
 }
-
-export type SessionTypeFilter = "all" | "Practice" | "Qualifying" | "Race";
-
-export type SessionStatus = "finished" | "live" | "upcoming";
-
-export type SessionType = "Practice" | "Qualifying" | "Race";

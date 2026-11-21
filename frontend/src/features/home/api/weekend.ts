@@ -1,5 +1,5 @@
 import { apiClient } from "../../../shared/api/client.ts";
-import type { WeekendData } from "../../../shared/types/f1.ts";
+import type { WeekendData } from "../types.ts";
 
 export const weekendApi = {
   /**

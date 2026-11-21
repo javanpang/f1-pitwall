@@ -6,7 +6,7 @@ import {
   MoveRight,
 } from "lucide-react";
 
-import type { PitStop, PitStopTyre } from "../types";
+import type { PitStop, TyreSet } from "../types";
 import { formatPitDuration, positionDelta } from "../utils/pitStops";
 import { TyreBadge } from "./TyreBadge";
 
@@ -23,7 +23,7 @@ function Faint() {
   );
 }
 
-function Tyre({ tyre }: { tyre: PitStopTyre | null }) {
+function Tyre({ tyre }: { tyre: TyreSet | null }) {
   if (!tyre) return <Faint />;
   const used = tyre.ageLaps !== null && tyre.ageLaps > 0;
   return (

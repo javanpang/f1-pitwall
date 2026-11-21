@@ -1,8 +1,8 @@
-import type { TyreCompound } from "../types";
+import type { TyreSet } from "../types";
 import { TYRE_CONFIG } from "../utils/timingFormat";
 
 interface TyreBadgeProps {
-  tyre: { compound: TyreCompound; ageLaps: number | null };
+  tyre: TyreSet;
   size?: number;
   showAge?: boolean;
 }

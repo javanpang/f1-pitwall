@@ -1,6 +1,8 @@
 import { Activity, Clock, MapPin, Radio } from "lucide-react";
 import { useCurrentWeekend } from "../hooks/useCurrentWeekend.ts";
-import type { Session, WeekendStatus } from "../../../shared/types/f1.ts";
+import type { ReactNode } from "react";
+import type { Session } from "../../../shared/types/f1.ts";
+import type { WeekendStatus } from "../types.ts";
 import { formatDateRange } from "../../../shared/utils/date.ts";
 import { formatTime } from "../../../shared/utils/date.ts";
 
@@ -33,7 +35,7 @@ const DataPoint = ({
   value,
   sub,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
   value: string | null;
   sub: string | null;
