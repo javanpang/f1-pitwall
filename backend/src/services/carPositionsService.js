@@ -1,11 +1,7 @@
-import {
-  getDrivers,
-  getLocation,
-  getSessions,
-} from "../clients/openf1Client.js";
+import { getDrivers, getLocation } from "../clients/openf1Client.js";
 
-import { HttpError } from "../errors/httpError.js";
 import { memoizeAsync } from "../utils/memoizeAsync.js";
+import { cacheWhenFinished } from "./sessionCache.js";
 import { toTeamColour } from "../transforms/shapers.js";
 
 export const CHUNK_MS = 60_000;
@@ -72,8 +68,7 @@ async function loadChunk(sessionKey, fromMs) {
   };
 }
 
-const getFinishedChunk = memoizeAsync(loadChunk, {
-  ttlMs: FINISHED_TTL_MS,
+const getCachedChunk = cacheWhenFinished(loadChunk, {
   maxEntries: MAX_CACHED_CHUNKS,
 });
 
@@ -81,13 +76,6 @@ const getFinishedChunk = memoizeAsync(loadChunk, {
  * Returns every car's position samples for the `CHUNK_MS` window starting at `fromMs`.
  */
 export async function getCarPositions(sessionKey, fromMs) {
-  const [session] = await getSessions({ session_key: sessionKey });
-  if (!session) throw new HttpError(404, "Session not found");
-
-  const finished = Date.parse(session.date_end) < Date.now();
-  const chunk = finished
-    ? await getFinishedChunk(sessionKey, fromMs)
-    : await loadChunk(sessionKey, fromMs);
-
+  const { finished, data: chunk } = await getCachedChunk(sessionKey, fromMs);
   return { finished, chunk };
 }

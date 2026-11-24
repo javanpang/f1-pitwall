@@ -1,5 +1,4 @@
 import {
-  getSessions,
   getDrivers,
   getIntervals,
   getLaps,
@@ -8,17 +7,13 @@ import {
   getStints,
 } from "../clients/openf1Client.js";
 
-import { HttpError } from "../errors/httpError.js";
-import { memoizeAsync } from "../utils/memoizeAsync.js";
+import { cacheWhenFinished } from "./sessionCache.js";
 import {
   buildTimingTowerRows,
   indexTimingData,
 } from "../transforms/buildTimingTowerRows.js";
 import { buildLapGaps } from "../transforms/buildLapGaps.js";
 import { buildPitStops } from "../transforms/buildPitStops.js";
-
-const FINISHED_TTL_MS = 24 * 60 * 60 * 1000;
-const MAX_CACHED_SESSIONS = 30;
 
 async function loadTimingIndex(sessionKey) {
   const [drivers, positions, intervals, laps, stints, pits] = await Promise.all(
@@ -34,34 +29,19 @@ async function loadTimingIndex(sessionKey) {
   return indexTimingData({ drivers, positions, intervals, laps, stints, pits });
 }
 
-const getFinishedIndex = memoizeAsync(loadTimingIndex, {
-  ttlMs: FINISHED_TTL_MS,
-  maxEntries: MAX_CACHED_SESSIONS,
-});
-
-async function getTimingIndex(sessionKey) {
-  const [session] = await getSessions({ session_key: sessionKey });
-  if (!session) throw new HttpError(404, "Session not found");
-
-  const finished = Date.parse(session.date_end) < Date.now();
-  const index = finished
-    ? await getFinishedIndex(sessionKey)
-    : await loadTimingIndex(sessionKey);
-
-  return { finished, index };
-}
+const getTimingIndex = cacheWhenFinished(loadTimingIndex);
 
 export async function getTiming(sessionKey, at = null) {
-  const { finished, index } = await getTimingIndex(sessionKey);
+  const { finished, data: index } = await getTimingIndex(sessionKey);
   return { finished, rows: buildTimingTowerRows(index, at) };
 }
 
 export async function getLapGaps(sessionKey) {
-  const { finished, index } = await getTimingIndex(sessionKey);
+  const { finished, data: index } = await getTimingIndex(sessionKey);
   return { finished, lapGaps: buildLapGaps(index) };
 }
 
 export async function getPitStops(sessionKey) {
-  const { finished, index } = await getTimingIndex(sessionKey);
+  const { finished, data: index } = await getTimingIndex(sessionKey);
   return { finished, pitStops: buildPitStops(index) };
 }

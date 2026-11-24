@@ -1,6 +1,7 @@
-import { getLaps, getLocation, getSessions } from "../clients/openf1Client.js";
+import { getLaps, getLocation } from "../clients/openf1Client.js";
 import { HttpError } from "../errors/httpError.js";
 import { memoizeAsync } from "../utils/memoizeAsync.js";
+import { findSession } from "./sessionCache.js";
 
 const CIRCUIT_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -87,8 +88,6 @@ const loadCircuitTrack = memoizeAsync(loadTrack, {
  * Fetches the track outline for a session, using a cached result if available.
  */
 export async function getTrack(sessionKey) {
-  const [session] = await getSessions({ session_key: sessionKey });
-  if (!session) throw new HttpError(404, "Session not found");
-
+  const session = await findSession(sessionKey);
   return loadCircuitTrack({ session });
 }

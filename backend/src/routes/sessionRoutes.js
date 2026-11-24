@@ -1,7 +1,11 @@
 import { Router } from "express";
 
 import { getTrack } from "../services/trackService.js";
-import { getLapGaps, getPitStops, getTiming } from "../services/timingService.js";
+import {
+  getLapGaps,
+  getPitStops,
+  getTiming,
+} from "../services/timingService.js";
 import { getRaceFeed } from "../services/raceFeedService.js";
 import { getSessionDetails } from "../services/sessionService.js";
 import { getCarPositions } from "../services/carPositionsService.js";
@@ -21,6 +25,14 @@ router.param("sessionKey", (req, res, next, raw) => {
   next();
 });
 
+const FINISHED_CACHE = "public, max-age=86400";
+
+/** Cache finished sessions for a day */
+function sendSessionData(res, finished, body) {
+  res.set("Cache-Control", finished ? FINISHED_CACHE : "no-store");
+  res.json(body);
+}
+
 /** Parse an ISO timestamp string into milliseconds. */
 function parseTimestamp(raw, name = "at") {
   if (raw === undefined) return null;
@@ -36,18 +48,17 @@ function parseTimestamp(raw, name = "at") {
 
 // GET /api/sessions/:sessionKey
 router.get("/:sessionKey", async (req, res) => {
-  const session = await getSessionDetails(Number(req.params.sessionKey));
-
-  const finished = Date.parse(session.dateEnd) < Date.now();
-  res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
-  res.json(session);
+  const { finished, session } = await getSessionDetails(
+    Number(req.params.sessionKey),
+  );
+  sendSessionData(res, finished, session);
 });
 
 // GET /api/sessions/:sessionKey/track
 router.get("/:sessionKey/track", async (req, res) => {
   const track = await getTrack(Number(req.params.sessionKey));
 
-  res.set("Cache-Control", "public, max-age=86400");
+  res.set("Cache-Control", FINISHED_CACHE);
   res.json(track);
 });
 
@@ -55,17 +66,13 @@ router.get("/:sessionKey/track", async (req, res) => {
 router.get("/:sessionKey/timing", async (req, res) => {
   const at = parseTimestamp(req.query.at);
   const { rows, finished } = await getTiming(Number(req.params.sessionKey), at);
-
-  res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
-  res.json(rows);
+  sendSessionData(res, finished, rows);
 });
 
 // GET /api/sessions/:sessionKey/lap-gaps
 router.get("/:sessionKey/lap-gaps", async (req, res) => {
   const { lapGaps, finished } = await getLapGaps(Number(req.params.sessionKey));
-
-  res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
-  res.json(lapGaps);
+  sendSessionData(res, finished, lapGaps);
 });
 
 // GET /api/sessions/:sessionKey/pit-stops
@@ -73,17 +80,13 @@ router.get("/:sessionKey/pit-stops", async (req, res) => {
   const { pitStops, finished } = await getPitStops(
     Number(req.params.sessionKey),
   );
-
-  res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
-  res.json(pitStops);
+  sendSessionData(res, finished, pitStops);
 });
 
 // GET /api/sessions/:sessionKey/events
 router.get("/:sessionKey/events", async (req, res) => {
   const { events, finished } = await getRaceFeed(Number(req.params.sessionKey));
-
-  res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
-  res.json(events);
+  sendSessionData(res, finished, events);
 });
 
 // GET /api/sessions/:sessionKey/positions?from=2026-01-01T12:00:00Z
@@ -94,9 +97,7 @@ router.get("/:sessionKey/positions", async (req, res) => {
     Number(req.params.sessionKey),
     from,
   );
-
-  res.set("Cache-Control", finished ? "public, max-age=86400" : "no-store");
-  res.json(chunk);
+  sendSessionData(res, finished, chunk);
 });
 
 export default router;
